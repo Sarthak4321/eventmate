@@ -151,38 +151,7 @@ export default function ServicesPage() {
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-black text-white py-20">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12">
-          <div>
-            <h3 className="font-semibold text-lg">EventMate</h3>
-            <p className="mt-4 text-gray-400">
-              India’s trusted platform for discovering
-              verified event professionals.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Company</h4>
-            <ul className="space-y-3 text-gray-400 text-sm">
-              <li><Link href="/about">About</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
-              <li><Link href="/become-a-vendor">Become a Vendor</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Legal</h4>
-            <ul className="space-y-3 text-gray-400 text-sm">
-              <li>Privacy Policy</li>
-              <li>Terms of Service</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-16 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} EventMate. All rights reserved.
-        </div>
-      </footer>
+      
 
     </main>
   );

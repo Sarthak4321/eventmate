@@ -10,10 +10,15 @@ export default function SignupPage() {
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
 
-    // TEMP (replace with backend later)
+    // TEMP: mock auth (replace with backend later)
     localStorage.setItem("eventmate_role", role);
 
-    router.push(role === "vendor" ? "/vendor/dashboard" : "/");
+    // ✅ SINGLE, CLEAR ROUTE DECISION
+    if (role === "user") {
+      router.push("/dashboard");
+    } else {
+      router.push("/vendor/dashboard");
+    }
   }
 
   return (
@@ -33,6 +38,7 @@ export default function SignupPage() {
         {/* ROLE TOGGLE */}
         <div className="mt-8 flex gap-2 bg-gray-100 rounded-full p-1">
           <button
+            type="button"
             onClick={() => setRole("user")}
             className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
               role === "user"
@@ -44,6 +50,7 @@ export default function SignupPage() {
           </button>
 
           <button
+            type="button"
             onClick={() => setRole("vendor")}
             className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
               role === "vendor"
@@ -58,30 +65,21 @@ export default function SignupPage() {
         {/* FORM */}
         <form onSubmit={handleSignup} className="mt-8 space-y-4">
 
-          {/* COMMON FIELDS */}
+          {/* COMMON */}
           <input required placeholder="Full Name" className="auth-input" />
           <input required type="email" placeholder="Email Address" className="auth-input" />
           <input required type="password" placeholder="Password" className="auth-input" />
 
+          {/* VENDOR ONLY */}
           {role === "vendor" && (
             <>
-              {/* BUSINESS INFO */}
               <div className="pt-4">
                 <p className="text-sm font-medium text-gray-700 mb-2">
                   Business Information
                 </p>
 
-                <input
-                  required
-                  placeholder="Business / Brand Name"
-                  className="auth-input"
-                />
-
-                <input
-                  required
-                  placeholder="Phone Number"
-                  className="auth-input"
-                />
+                <input required placeholder="Business / Brand Name" className="auth-input" />
+                <input required placeholder="Phone Number" className="auth-input" />
 
                 <select required className="auth-input">
                   <option value="">Service Category</option>
@@ -94,14 +92,9 @@ export default function SignupPage() {
                   <option>Entertainment</option>
                 </select>
 
-                <input
-                  required
-                  placeholder="City / Service Location"
-                  className="auth-input"
-                />
+                <input required placeholder="City / Service Location" className="auth-input" />
               </div>
 
-              {/* EXPERIENCE & PRICING */}
               <div className="pt-4">
                 <p className="text-sm font-medium text-gray-700 mb-2">
                   Experience & Pricing
@@ -115,11 +108,7 @@ export default function SignupPage() {
                   <option>5+ years</option>
                 </select>
 
-                <input
-                  required
-                  placeholder="Starting Price (₹)"
-                  className="auth-input"
-                />
+                <input required placeholder="Starting Price (₹)" className="auth-input" />
 
                 <select required className="auth-input">
                   <option value="">Team Size</option>
@@ -130,9 +119,8 @@ export default function SignupPage() {
                 </select>
               </div>
 
-              {/* TRUST NOTE */}
               <p className="text-xs text-gray-400 mt-2">
-                ✔ No commission · ✔ Direct customer leads · ✔ Profile verification after signup
+                ✔ No commission · ✔ Direct leads · ✔ Verification after signup
               </p>
             </>
           )}

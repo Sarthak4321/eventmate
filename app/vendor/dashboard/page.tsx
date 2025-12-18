@@ -1,127 +1,205 @@
 "use client";
 
 import Link from "next/link";
-import VendorNavbar from "@/components/VendorNavbar";
-
 
 export default function VendorDashboard() {
   return (
-    <main className="min-h-screen bg-[#F7F7FB] pt-28 pb-32">
-      <div className="max-w-7xl mx-auto px-6">
+    <main className="min-h-screen bg-[#F6F7FB] pt-24 pb-32">
+      <div className="max-w-7xl mx-auto px-6 space-y-14">
 
-        <VendorNavbar />
-
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        {/* ================= HEADER ================= */}
+        <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-semibold">Vendor Dashboard</h1>
-            <p className="mt-2 text-gray-600">
-              Track performance, manage services, and respond to bookings.
+            <h1 className="text-3xl font-semibold">
+              Vendor Dashboard
+            </h1>
+            <p className="mt-1 text-gray-600">
+              Monitor performance, manage services & convert leads.
             </p>
           </div>
 
           <div className="flex gap-3">
             <Link
-              href="/vendor/services"
-              className="px-6 py-3 rounded-full bg-black text-white text-sm font-medium hover:opacity-90"
+              href="/vendor/services/new"
+              className="px-6 py-3 rounded-full bg-black text-white text-sm font-medium"
             >
-              + Add Service
+              + Create Service
             </Link>
             <Link
               href="/vendor/profile"
-              className="px-6 py-3 rounded-full border border-black/10 text-sm hover:bg-black/5"
+              className="px-6 py-3 rounded-full bg-white border text-sm"
             >
               Edit Profile
             </Link>
           </div>
-        </div>
+        </section>
 
-        {/* STATS */}
-        <div className="mt-12 grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {/* ================= KPI STRIP ================= */}
+        <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: "Total Views", value: "12,480" },
-            { label: "Bookings", value: "128" },
-            { label: "Active Services", value: "6" },
-            { label: "Earnings", value: "₹4.8L" },
-          ].map((stat) => (
+            { label: "New Leads", value: "18", meta: "Last 7 days" },
+            { label: "Bookings", value: "4", meta: "Confirmed" },
+            { label: "Revenue", value: "₹1.2L", meta: "This month" },
+            { label: "Profile Views", value: "392", meta: "+18% growth" },
+          ].map((kpi) => (
             <div
-              key={stat.label}
+              key={kpi.label}
               className="bg-white rounded-2xl p-6 shadow-sm"
             >
-              <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="mt-2 text-2xl font-semibold">{stat.value}</p>
+              <p className="text-sm text-gray-500">{kpi.label}</p>
+              <p className="mt-2 text-2xl font-semibold">{kpi.value}</p>
+              <p className="mt-1 text-xs text-gray-400">{kpi.meta}</p>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* MAIN GRID */}
-        <div className="mt-14 grid md:grid-cols-3 gap-8">
+        {/* ================= QUICK ACTIONS ================= */}
+        <section className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              title: "Respond to Leads",
+              desc: "Reply within 24h to boost ranking",
+              link: "/vendor/bookings",
+            },
+            {
+              title: "Add Pricing Packages",
+              desc: "Services with pricing convert better",
+              link: "/vendor/services",
+            },
+            {
+              title: "Upload Portfolio",
+              desc: "Photos & videos attract more clients",
+              link: "/vendor/profile",
+            },
+          ].map((item) => (
+            <Link
+              key={item.title}
+              href={item.link}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 className="font-medium">{item.title}</h3>
+              <p className="mt-2 text-sm text-gray-600">{item.desc}</p>
+            </Link>
+          ))}
+        </section>
 
-          {/* LEFT: BOOKINGS */}
-          <div className="md:col-span-2 bg-white rounded-3xl p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Recent Booking Requests</h2>
-              <Link
-                href="/vendor/bookings"
-                className="text-sm text-indigo-600 hover:underline"
-              >
-                View all
-              </Link>
-            </div>
-
-            {/* Empty state */}
-            <div className="text-center py-16 border border-dashed rounded-2xl">
-              <p className="text-gray-500">
-                No new booking requests yet
-              </p>
-              <p className="text-sm text-gray-400 mt-2">
-                Optimize your profile to get discovered faster.
-              </p>
-            </div>
-          </div>
-
-          {/* RIGHT: PROFILE STATUS */}
+        {/* ================= LEADS & BOOKINGS ================= */}
+        <section className="grid lg:grid-cols-2 gap-8">
+          {/* Leads */}
           <div className="bg-white rounded-3xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold mb-6">
-              Profile Completion
+            <h2 className="text-lg font-semibold mb-6">
+              Recent Leads
             </h2>
 
-            {/* Progress */}
-            <div className="w-full bg-gray-100 rounded-full h-2">
-              <div className="w-[65%] h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600" />
+            <div className="space-y-4">
+              {["Wedding Photography", "Decor & Styling"].map((lead) => (
+                <div
+                  key={lead}
+                  className="flex items-center justify-between border rounded-xl p-4"
+                >
+                  <div>
+                    <p className="font-medium">{lead}</p>
+                    <p className="text-xs text-gray-500">
+                      Event in 2 weeks · Delhi
+                    </p>
+                  </div>
+                  <Link
+                    href="/vendor/bookings"
+                    className="text-sm text-indigo-600"
+                  >
+                    Respond →
+                  </Link>
+                </div>
+              ))}
             </div>
+          </div>
 
-            <p className="mt-4 text-sm text-gray-600">
-              Your profile is <strong>65% complete</strong>
-            </p>
+          {/* Bookings */}
+          <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <h2 className="text-lg font-semibold mb-6">
+              Upcoming Bookings
+            </h2>
 
-            <ul className="mt-6 space-y-3 text-sm text-gray-600">
-              <li>• Add portfolio images</li>
-              <li>• Add pricing details</li>
-              <li>• Verify contact info</li>
-            </ul>
+            <div className="space-y-4">
+              <div className="border rounded-xl p-4">
+                <p className="font-medium">Wedding Shoot</p>
+                <p className="text-xs text-gray-500">
+                  24 March · Mumbai · ₹65,000
+                </p>
+              </div>
 
+              <p className="text-sm text-gray-400">
+                No more upcoming bookings
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= SERVICES PERFORMANCE ================= */}
+        <section className="bg-white rounded-3xl p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold">
+              Service Performance
+            </h2>
             <Link
-              href="/vendor/profile"
-              className="inline-block mt-6 text-sm text-indigo-600 font-medium"
+              href="/vendor/services"
+              className="text-sm text-indigo-600"
             >
-              Complete profile →
+              Manage services →
             </Link>
           </div>
-        </div>
 
-        {/* ACTIVITY */}
-        <div className="mt-14 bg-white rounded-3xl p-8 shadow-sm">
-          <h2 className="text-xl font-semibold mb-6">
-            Recent Activity
-          </h2>
-
-          <div className="space-y-4 text-sm text-gray-600">
-            <p>• Your profile was viewed 24 times today</p>
-            <p>• One customer bookmarked your service</p>
-            <p>• You appeared in 3 search results</p>
+          <div className="space-y-4">
+            {[
+              { name: "Wedding Photography", views: 240, leads: 8 },
+              { name: "Decor & Styling", views: 152, leads: 4 },
+            ].map((service) => (
+              <div
+                key={service.name}
+                className="flex justify-between items-center border rounded-xl p-4"
+              >
+                <div>
+                  <p className="font-medium">{service.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {service.views} views · {service.leads} leads
+                  </p>
+                </div>
+                <Link
+                  href="/vendor/services"
+                  className="text-sm text-indigo-600"
+                >
+                  Edit →
+                </Link>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
+
+        {/* ================= GROWTH ================= */}
+        <section className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8">
+          <h2 className="text-lg font-semibold">
+            Profile Optimization
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Complete profiles rank higher and convert 3× better.
+          </p>
+
+          <div className="mt-6">
+            <div className="w-full bg-white rounded-full h-2">
+              <div className="w-[65%] h-2 bg-indigo-600 rounded-full" />
+            </div>
+            <p className="mt-3 text-sm text-gray-600">
+              65% complete
+            </p>
+          </div>
+
+          <Link
+            href="/vendor/profile"
+            className="inline-block mt-5 text-sm font-medium text-indigo-600"
+          >
+            Complete profile →
+          </Link>
+        </section>
 
       </div>
     </main>

@@ -1,13 +1,28 @@
 import "./globals.css";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700"],
+});
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const serif = DM_Serif_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400"],
+});
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable}`}>
+      <body
+        className={`${jakarta.variable} ${serif.variable} font-sans antialiased`}
+      >
         {children}
       </body>
     </html>

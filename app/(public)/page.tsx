@@ -136,6 +136,8 @@ export default function HomePage() {
         </div>
       </section>
 
+
+
       {/* ================= SERVICES ================= */}
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6">
@@ -149,68 +151,81 @@ export default function HomePage() {
             {[
               {
                 title: "Wedding Venues",
+                slug: "wedding-venues",
                 img: "/hero/wedding-venue.jpg",
               },
               {
                 title: "Photography",
+                slug: "photography",
                 img: "/hero/photography.jpg",
               },
               {
                 title: "Makeup Artists",
-                img: "/hero/catering.jpg",
+                slug: "makeup-artists",
+                img: "/hero/makeup.jpg",
               },
               {
                 title: "Decor & Styling",
+                slug: "decor-styling",
                 img: "/hero/decor.jpg",
               },
               {
                 title: "Catering",
-                img: "/hero/makeup.jpg",
+                slug: "catering",
+                img: "/hero/catering.jpg",
               },
               {
                 title: "Entertainment",
+                slug: "entertainment",
                 img: "/hero/entertainment.jpg",
               },
-            ].map((item, i) => (
-              <div
-                key={item.title}
-                className="group relative h-[260px] rounded-3xl overflow-hidden cursor-pointer"
+            ].map((item) => (
+              <Link
+                key={item.slug}
+                href={`/services/${item.slug}`}
+                className="group relative h-[260px] rounded-3xl overflow-hidden block"
               >
                 {/* IMAGE */}
                 <img
                   src={item.img}
                   alt={item.title}
                   className="absolute inset-0 w-full h-full object-cover
-                       transition-transform duration-700 ease-out
-                       group-hover:scale-110"
+              transition-transform duration-700 ease-out
+              group-hover:scale-110"
                 />
 
                 {/* GRADIENT OVERLAY */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                {/* TEXT */}
-                <div className="absolute bottom-6 left-6 right-6">
+                {/* CONTENT */}
+                <div className="absolute bottom-6 left-6 right-6 z-10">
                   <p className="text-white text-xl font-semibold">
                     {item.title}
                   </p>
-                  <p className="mt-1 text-sm text-white/80 opacity-0 translate-y-2
-                          transition-all duration-500
-                          group-hover:opacity-100 group-hover:translate-y-0">
+
+                  {/* Desktop hover text */}
+                  <p
+                    className="mt-1 text-sm text-white/80
+                opacity-100 md:opacity-0 md:translate-y-2
+                transition-all duration-500
+                md:group-hover:opacity-100 md:group-hover:translate-y-0"
+                  >
                     Explore vendors →
                   </p>
                 </div>
 
-                {/* SOFT LIFT */}
+                {/* HOVER SHADOW */}
                 <div
                   className="absolute inset-0 rounded-3xl
-                       transition-shadow duration-500
-                       group-hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
+              transition-shadow duration-500
+              group-hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
                 />
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
+
 
 
       {/* ================= TRUST ================= */}

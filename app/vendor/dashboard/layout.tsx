@@ -1,11 +1,19 @@
 import VendorNavbar from "@/components/VendorNavbar";
 
-export default function VendorDashboardLayout({ children }: { children: React.ReactNode }) {
+export default function VendorDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="min-h-screen bg-[#0B0B0B] text-white">
+    <div className="min-h-screen bg-[#F7F8FC] text-black">
       <VendorNavbar />
-      <main className="pt-24 px-6">
-        {children}
+
+      {/* Page container */}
+      <main className="pt-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

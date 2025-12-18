@@ -18,7 +18,7 @@ export default function Hero3DCarousel() {
   useEffect(() => {
     const timer = setInterval(() => {
       setActive((i) => (i + 1) % slides.length);
-    }, 5500); // slower = premium
+    }, 2500); // slower = premium
 
     return () => clearInterval(timer);
   }, []);

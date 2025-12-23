@@ -73,4 +73,4 @@ export default function Hero3DCarousel() {
       })}
     </div>
   );
-}
+};

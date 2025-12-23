@@ -1,207 +1,177 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Calendar, MessageSquare, IndianRupee, TrendingUp, CheckCircle2 } from "lucide-react";
+import clsx from "clsx";
+import { useVendorStore } from "@/lib/store";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import { useEffect, useState } from "react";
 
-export default function VendorDashboard() {
+export default function DashboardPage() {
+  const { leads, profile } = useVendorStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="p-8">Loading dashboard...</div>;
+  }
+
+  // --- COMPUTED STATS ---
+  const newLeadsCount = leads.filter(l => l.status === "New").length;
+  const wonBookings = leads.filter(l => l.status === "Won").length;
+
+  // Fake Revenue calc: Sum of won leads budget
+  const totalRevenue = leads
+    .filter(l => l.status === "Won")
+    .reduce((acc, curr) => {
+      // Simple parsing: remove non-digit/dot chars
+      const clean = curr.budget.replace(/[^0-9.]/g, '');
+      return acc + (parseFloat(clean) || 0);
+    }, 0);
+
+  const formatCurrency = (val: number) =>
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 3 }).format(val);
+
+  const upcomingEvents = leads
+    .filter(l => l.status === "Won")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3);
+
+  const recentLeads = [...leads]
+    .sort((a, b) => new Date(b.recievedAt).getTime() - new Date(a.recievedAt).getTime())
+    .slice(0, 3);
+
   return (
-    <main className="min-h-screen bg-[#F6F7FB] pt-24 pb-32">
-      <div className="max-w-7xl mx-auto px-6 space-y-14">
+    <div className="p-8 space-y-8">
 
-        {/* ================= HEADER ================= */}
-        <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-semibold">
-              Vendor Dashboard
-            </h1>
-            <p className="mt-1 text-gray-600">
-              Monitor performance, manage services & convert leads.
+      {/* HEADER */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500 mt-1">Good afternoon, {profile.businessName}!</p>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/vendor/leads" className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm shadow-indigo-200">
+            View New Leads ({newLeadsCount})
+          </Link>
+        </div>
+      </div>
+
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: "Total Revenue", value: formatCurrency(totalRevenue), change: "+12%", icon: IndianRupee },
+          { label: "New Leads", value: newLeadsCount.toString(), change: "+5", icon: MessageSquare },
+          { label: "Bookings", value: wonBookings.toString(), change: "On track", icon: CheckCircle2 },
+          { label: "Profile Views", value: "1.2k", change: "+18%", icon: TrendingUp },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-white p-6 rounded-2xl border shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</h3>
+              </div>
+              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <stat.icon className="w-5 h-5" />
+              </div>
+            </div>
+            <p className="text-xs font-medium text-green-600 mt-2 flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" /> {stat.change} <span className="text-gray-400 font-normal">vs last month</span>
             </p>
           </div>
+        ))}
+      </div>
 
-          <div className="flex gap-3">
-            <Link
-              href="/vendor/services/new"
-              className="px-6 py-3 rounded-full bg-black text-white text-sm font-medium"
-            >
-              + Create Service
-            </Link>
-            <Link
-              href="/vendor/profile"
-              className="px-6 py-3 rounded-full bg-white border text-sm"
-            >
-              Edit Profile
-            </Link>
-          </div>
-        </section>
+      {/* MAIN GRID */}
+      <div className="grid lg:grid-cols-3 gap-8">
 
-        {/* ================= KPI STRIP ================= */}
-        <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { label: "New Leads", value: "18", meta: "Last 7 days" },
-            { label: "Bookings", value: "4", meta: "Confirmed" },
-            { label: "Revenue", value: "₹1.2L", meta: "This month" },
-            { label: "Profile Views", value: "392", meta: "+18% growth" },
-          ].map((kpi) => (
-            <div
-              key={kpi.label}
-              className="bg-white rounded-2xl p-6 shadow-sm"
-            >
-              <p className="text-sm text-gray-500">{kpi.label}</p>
-              <p className="mt-2 text-2xl font-semibold">{kpi.value}</p>
-              <p className="mt-1 text-xs text-gray-400">{kpi.meta}</p>
+        {/* LEFT COL: LEADS */}
+        <div className="lg:col-span-2 space-y-8">
+
+          {/* Recent Leads */}
+          <section className="bg-white rounded-2xl border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-semibold text-lg">Recent Inquiries</h2>
+              <Link href="/vendor/leads" className="text-sm text-indigo-600 font-medium hover:underline">View All</Link>
             </div>
-          ))}
-        </section>
-
-        {/* ================= QUICK ACTIONS ================= */}
-        <section className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              title: "Respond to Leads",
-              desc: "Reply within 24h to boost ranking",
-              link: "/vendor/bookings",
-            },
-            {
-              title: "Add Pricing Packages",
-              desc: "Services with pricing convert better",
-              link: "/vendor/services",
-            },
-            {
-              title: "Upload Portfolio",
-              desc: "Photos & videos attract more clients",
-              link: "/vendor/profile",
-            },
-          ].map((item) => (
-            <Link
-              key={item.title}
-              href={item.link}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition"
-            >
-              <h3 className="font-medium">{item.title}</h3>
-              <p className="mt-2 text-sm text-gray-600">{item.desc}</p>
-            </Link>
-          ))}
-        </section>
-
-        {/* ================= LEADS & BOOKINGS ================= */}
-        <section className="grid lg:grid-cols-2 gap-8">
-          {/* Leads */}
-          <div className="bg-white rounded-3xl p-8 shadow-sm">
-            <h2 className="text-lg font-semibold mb-6">
-              Recent Leads
-            </h2>
 
             <div className="space-y-4">
-              {["Wedding Photography", "Decor & Styling"].map((lead) => (
-                <div
-                  key={lead}
-                  className="flex items-center justify-between border rounded-xl p-4"
-                >
-                  <div>
-                    <p className="font-medium">{lead}</p>
-                    <p className="text-xs text-gray-500">
-                      Event in 2 weeks · Delhi
-                    </p>
+              {recentLeads.map((lead) => (
+                <div key={lead.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                      {lead.name[0]}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition">{lead.name}</h4>
+                      <p className="text-xs text-gray-500">{lead.eventType} · {formatDistanceToNow(parseISO(lead.recievedAt), { addSuffix: true })}</p>
+                    </div>
                   </div>
-                  <Link
-                    href="/vendor/bookings"
-                    className="text-sm text-indigo-600"
-                  >
-                    Respond →
-                  </Link>
+                  <div className="flex items-center gap-4">
+                    {lead.status === "New" && (
+                      <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide">New</span>
+                    )}
+                    <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600" />
+                  </div>
                 </div>
               ))}
+              {recentLeads.length === 0 && <p className="text-gray-500 text-sm">No recent leads.</p>}
             </div>
-          </div>
+          </section>
 
-          {/* Bookings */}
-          <div className="bg-white rounded-3xl p-8 shadow-sm">
-            <h2 className="text-lg font-semibold mb-6">
-              Upcoming Bookings
-            </h2>
-
-            <div className="space-y-4">
-              <div className="border rounded-xl p-4">
-                <p className="font-medium">Wedding Shoot</p>
-                <p className="text-xs text-gray-500">
-                  24 March · Mumbai · ₹65,000
-                </p>
-              </div>
-
-              <p className="text-sm text-gray-400">
-                No more upcoming bookings
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ================= SERVICES PERFORMANCE ================= */}
-        <section className="bg-white rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">
-              Service Performance
-            </h2>
-            <Link
-              href="/vendor/services"
-              className="text-sm text-indigo-600"
-            >
-              Manage services →
-            </Link>
-          </div>
-
-          <div className="space-y-4">
+          {/* Quick Actions */}
+          <section className="grid sm:grid-cols-3 gap-4">
             {[
-              { name: "Wedding Photography", views: 240, leads: 8 },
-              { name: "Decor & Styling", views: 152, leads: 4 },
-            ].map((service) => (
-              <div
-                key={service.name}
-                className="flex justify-between items-center border rounded-xl p-4"
-              >
-                <div>
-                  <p className="font-medium">{service.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {service.views} views · {service.leads} leads
-                  </p>
-                </div>
-                <Link
-                  href="/vendor/services"
-                  className="text-sm text-indigo-600"
-                >
-                  Edit →
-                </Link>
-              </div>
+              { title: "Create Quote", desc: "Send pricing in 30s", href: "/vendor/quotes", color: "bg-blue-50 text-blue-700" },
+              { title: "Add Offer", desc: "Boost weekday bookings", href: "/vendor/offers", color: "bg-purple-50 text-purple-700" },
+              { title: "Block Dates", desc: "Update availability", href: "/vendor/calendar", color: "bg-amber-50 text-amber-700" },
+            ].map((action) => (
+              <Link key={action.title} href={action.href} className={clsx("p-5 rounded-2xl border transition hover:shadow-md", action.color)}>
+                <h3 className="font-bold">{action.title}</h3>
+                <p className="text-xs opacity-75 mt-1">{action.desc}</p>
+              </Link>
             ))}
-          </div>
-        </section>
+          </section>
 
-        {/* ================= GROWTH ================= */}
-        <section className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8">
-          <h2 className="text-lg font-semibold">
-            Profile Optimization
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Complete profiles rank higher and convert 3× better.
-          </p>
+        </div>
 
-          <div className="mt-6">
-            <div className="w-full bg-white rounded-full h-2">
-              <div className="w-[65%] h-2 bg-indigo-600 rounded-full" />
+        {/* RIGHT COL: CALENDAR WIDGET */}
+        <div className="space-y-8">
+          <section className="bg-white rounded-2xl border shadow-sm p-6 h-full">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-semibold text-lg">Upcoming Schedule</h2>
+              <Link href="/vendor/calendar" className="p-2 hover:bg-gray-100 rounded-lg">
+                <Calendar className="w-5 h-5 text-gray-500" />
+              </Link>
             </div>
-            <p className="mt-3 text-sm text-gray-600">
-              65% complete
-            </p>
-          </div>
 
-          <Link
-            href="/vendor/profile"
-            className="inline-block mt-5 text-sm font-medium text-indigo-600"
-          >
-            Complete profile →
-          </Link>
-        </section>
+            <div className="space-y-6">
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((ev) => (
+                  <div key={ev.id} className="flex gap-4">
+                    <div className="text-center w-12">
+                      <p className="text-xs text-gray-500 uppercase font-bold">{new Date(ev.date).toLocaleString('default', { month: 'short' })}</p>
+                      <p className="text-xl font-bold text-gray-900">{new Date(ev.date).getDate()}</p>
+                    </div>
+                    <div className="flex-1 pb-6 border-l-2 border-indigo-100 pl-4 relative">
+                      <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white"></div>
+                      <h4 className="font-semibold">{ev.name}</h4>
+                      <p className="text-sm text-gray-500 mt-1">{ev.location}</p>
+                      <p className="text-xs text-indigo-600 mt-2 font-medium">{ev.eventType}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-gray-500">No upcoming bookings.</div>
+              )}
+            </div>
+          </section>
+        </div>
 
       </div>
-    </main>
+    </div>
   );
 }

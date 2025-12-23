@@ -1,7 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 import Hero3DScene from "@/components/Hero3DScene";
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+const stagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2
+    }
+  }
+};
 
 const services = [
   {
@@ -45,32 +66,45 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-5 md:px-6 grid lg:grid-cols-2 gap-14 items-center">
 
           {/* LEFT */}
-          <div>
-            <span className="inline-block mb-3 px-4 py-1.5 rounded-full bg-purple-100 text-purple-600 text-xs sm:text-sm font-medium">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+          >
+            <motion.span
+              variants={fadeInUp}
+              className="inline-block mb-3 px-4 py-1.5 rounded-full bg-purple-100 text-purple-600 text-xs sm:text-sm font-medium"
+            >
               ✨ India’s trusted event discovery platform
-            </span>
+            </motion.span>
 
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-playfair font-bold leading-tight">
+            <motion.h1
+              variants={fadeInUp}
+              className="text-3xl sm:text-4xl md:text-6xl font-playfair font-bold leading-tight"
+            >
               Turn moments <br className="hidden sm:block" />
               into unforgettable memories.
-            </h1>
+            </motion.h1>
 
             {/* MOBILE HERO IMAGE */}
-            <div className="mt-6 lg:hidden">
+            <motion.div variants={fadeInUp} className="mt-6 lg:hidden">
               <img
                 src="/hero/bride.jpg"
                 alt="Indian bridal wedding"
                 className="w-full h-[280px] object-cover rounded-3xl shadow-xl"
               />
-            </div>
+            </motion.div>
 
-            <p className="mt-5 text-sm sm:text-base md:text-lg text-gray-600 max-w-xl">
+            <motion.p
+              variants={fadeInUp}
+              className="mt-5 text-sm sm:text-base md:text-lg text-gray-600 max-w-xl"
+            >
               Weddings, celebrations, and corporate events — discover verified vendors,
               inspiring ideas, and seamless planning in one place.
-            </p>
+            </motion.p>
 
             {/* SEARCH */}
-            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
+            <motion.div variants={fadeInUp} className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
               <input
                 placeholder="Search venues, photographers, makeup..."
                 className="w-full px-5 py-3 sm:py-4 rounded-xl border border-gray-200 focus:outline-none"
@@ -78,17 +112,22 @@ export default function HomePage() {
               <button className="px-6 py-3 sm:py-4 rounded-xl bg-purple-600 text-white font-medium">
                 Explore
               </button>
-            </div>
+            </motion.div>
 
-            <p className="mt-3 text-xs sm:text-sm text-gray-500">
+            <motion.p variants={fadeInUp} className="mt-3 text-xs sm:text-sm text-gray-500">
               1,200+ verified vendors · Zero commission · Direct booking
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           {/* DESKTOP HERO */}
-          <div className="hidden lg:flex justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="hidden lg:flex justify-center"
+          >
             <Hero3DScene />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -99,7 +138,13 @@ export default function HomePage() {
             Planning an event should feel exciting — not exhausting.
           </h2>
 
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+            className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             {[
               {
                 step: "01",
@@ -117,8 +162,9 @@ export default function HomePage() {
                 desc: "Trusted partners and smooth bookings.",
               },
             ].map((item) => (
-              <div
+              <motion.div
                 key={item.step}
+                variants={fadeInUp}
                 className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]"
               >
                 <span className="text-sm text-purple-600 font-medium">
@@ -130,9 +176,9 @@ export default function HomePage() {
                 <p className="mt-3 text-gray-600">
                   {item.desc}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -146,7 +192,13 @@ export default function HomePage() {
             Services curated for every celebration
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
 
             {[
               {
@@ -180,49 +232,50 @@ export default function HomePage() {
                 img: "/hero/entertainment.jpg",
               },
             ].map((item) => (
-              <Link
-                key={item.slug}
-                href={`/services/${item.slug}`}
-                className="group relative h-[260px] rounded-3xl overflow-hidden block"
-              >
-                {/* IMAGE */}
-                <img
-                  src={item.img}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover
+              <motion.div key={item.slug} variants={fadeInUp}>
+                <Link
+                  href={`/services/${item.slug}`}
+                  className="group relative h-[260px] rounded-3xl overflow-hidden block"
+                >
+                  {/* IMAGE */}
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover
               transition-transform duration-700 ease-out
               group-hover:scale-110"
-                />
+                  />
 
-                {/* GRADIENT OVERLAY */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  {/* GRADIENT OVERLAY */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                {/* CONTENT */}
-                <div className="absolute bottom-6 left-6 right-6 z-10">
-                  <p className="text-white text-xl font-semibold">
-                    {item.title}
-                  </p>
+                  {/* CONTENT */}
+                  <div className="absolute bottom-6 left-6 right-6 z-10">
+                    <p className="text-white text-xl font-semibold">
+                      {item.title}
+                    </p>
 
-                  {/* Desktop hover text */}
-                  <p
-                    className="mt-1 text-sm text-white/80
-                opacity-100 md:opacity-0 md:translate-y-2
-                transition-all duration-500
-                md:group-hover:opacity-100 md:group-hover:translate-y-0"
-                  >
-                    Explore vendors →
-                  </p>
-                </div>
+                    {/* Desktop hover text */}
+                    <p
+                      className="mt-1 text-sm text-white/80
+                  opacity-100 md:opacity-0 md:translate-y-2
+                  transition-all duration-500
+                  md:group-hover:opacity-100 md:group-hover:translate-y-0"
+                    >
+                      Explore vendors →
+                    </p>
+                  </div>
 
-                {/* HOVER SHADOW */}
-                <div
-                  className="absolute inset-0 rounded-3xl
-              transition-shadow duration-500
-              group-hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
-                />
-              </Link>
+                  {/* HOVER SHADOW */}
+                  <div
+                    className="absolute inset-0 rounded-3xl
+                transition-shadow duration-500
+                group-hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
+                  />
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -239,14 +292,21 @@ export default function HomePage() {
             across India.
           </p>
 
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={stagger}
+            className="mt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+          >
             {[
               { value: "1,200+", label: "Verified Vendors" },
               { value: "50,000+", label: "Events Planned" },
               { value: "0%", label: "Commission Model" },
             ].map((stat) => (
-              <div
+              <motion.div
                 key={stat.label}
+                variants={fadeInUp}
                 className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]"
               >
                 <p className="text-4xl font-semibold text-purple-600">
@@ -255,15 +315,21 @@ export default function HomePage() {
                 <p className="mt-2 text-gray-600">
                   {stat.label}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ================= VENDOR CTA ================= */}
       <section className="py-20 md:py-32">
-        <div className="max-w-5xl mx-auto px-5 md:px-6 text-center bg-white/80 backdrop-blur-xl rounded-3xl py-16 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.35)]">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="max-w-5xl mx-auto px-5 md:px-6 text-center bg-white/80 backdrop-blur-xl rounded-3xl py-16 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.35)]"
+        >
           <span className="inline-block mb-3 px-4 py-1 text-xs rounded-full bg-purple-100 text-purple-600 font-medium">
             For Vendors
           </span>
@@ -282,9 +348,9 @@ export default function HomePage() {
           >
             Join as a Vendor →
           </Link>
-        </div>
+        </motion.div>
       </section>
 
     </main>
   );
-}
+};

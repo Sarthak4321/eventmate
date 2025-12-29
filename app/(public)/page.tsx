@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import Hero3DScene from "@/components/Hero3DScene";
 
@@ -80,18 +81,21 @@ export default function HomePage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-3xl sm:text-4xl md:text-6xl font-playfair font-bold leading-tight"
+              className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight"
             >
               Turn moments <br className="hidden sm:block" />
               into unforgettable memories.
             </motion.h1>
 
             {/* MOBILE HERO IMAGE */}
-            <motion.div variants={fadeInUp} className="mt-6 lg:hidden">
-              <img
+            <motion.div variants={fadeInUp} className="mt-6 lg:hidden relative h-[280px] w-full rounded-3xl overflow-hidden shadow-xl">
+              <Image
                 src="/hero/bride.jpg"
                 alt="Indian bridal wedding"
-                className="w-full h-[280px] object-cover rounded-3xl shadow-xl"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </motion.div>
 
@@ -107,9 +111,9 @@ export default function HomePage() {
             <motion.div variants={fadeInUp} className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
               <input
                 placeholder="Search venues, photographers, makeup..."
-                className="w-full px-5 py-3 sm:py-4 rounded-xl border border-gray-200 focus:outline-none"
+                className="w-full px-5 py-3 sm:py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
               />
-              <button className="px-6 py-3 sm:py-4 rounded-xl bg-purple-600 text-white font-medium">
+              <button className="px-6 py-3 sm:py-4 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition">
                 Explore
               </button>
             </motion.div>
@@ -165,7 +169,7 @@ export default function HomePage() {
               <motion.div
                 key={item.step}
                 variants={fadeInUp}
-                className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]"
+                className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)] hover:shadow-[0_40px_90px_-30px_rgba(0,0,0,0.3)] transition-shadow duration-300"
               >
                 <span className="text-sm text-purple-600 font-medium">
                   {item.step}
@@ -181,8 +185,6 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
-
-
 
       {/* ================= SERVICES ================= */}
       <section className="py-24 md:py-32 bg-white">
@@ -238,12 +240,12 @@ export default function HomePage() {
                   className="group relative h-[260px] rounded-3xl overflow-hidden block"
                 >
                   {/* IMAGE */}
-                  <img
+                  <Image
                     src={item.img}
                     alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover
-              transition-transform duration-700 ease-out
-              group-hover:scale-110"
+                    fill
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
 
                   {/* GRADIENT OVERLAY */}
@@ -278,8 +280,6 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
-
-
 
       {/* ================= TRUST ================= */}
       <section className="py-20 md:py-32 bg-[#F7F7FB]">
@@ -344,7 +344,7 @@ export default function HomePage() {
 
           <Link
             href="/become-a-vendor"
-            className="inline-block mt-8 px-10 py-4 rounded-full bg-black text-white font-medium hover:opacity-90"
+            className="inline-block mt-8 px-10 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition-opacity"
           >
             Join as a Vendor →
           </Link>
@@ -353,4 +353,5 @@ export default function HomePage() {
 
     </main>
   );
-};
+}
+;

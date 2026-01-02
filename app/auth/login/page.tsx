@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Mail, Briefcase, Search } from "lucide-react";
+import { Mail, Briefcase, Search, ArrowRight, CheckCircle2, Phone, KeyRound, Loader2, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { signIn } from "next-auth/react";
 import {
   Form,
   FormControl,
@@ -18,184 +20,371 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-const loginSchema = z.object({
+// --- SCHEMAS ---
+const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
+});
+
+const phoneSchema = z.object({
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+});
+
+const otpSchema = z.object({
+  code: z.string().length(6, "OTP must be 6 digits"),
 });
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<"user" | "vendor">("user");
+  const [loginMethod, setLoginMethod] = useState<"phone" | "email">("email");
+  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [phone, setPhone] = useState("");
+  const [timer, setTimer] = useState(0);
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  // --- FORMS ---
+  const emailForm = useForm<z.infer<typeof emailSchema>>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: { email: "", password: "" },
   });
 
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
-    setLoading(true);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  const phoneForm = useForm<z.infer<typeof phoneSchema>>({
+    resolver: zodResolver(phoneSchema),
+    defaultValues: { phone: "" },
+  });
 
-    localStorage.setItem("eventmate_role", role);
-    toast.success("Welcome back!", {
-      description: "You have successfully logged in.",
-    });
+  const otpForm = useForm<z.infer<typeof otpSchema>>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: { code: "" },
+  });
 
-    if (role === "vendor") {
-      router.push("/vendor/dashboard");
-    } else {
-      router.push("/dashboard");
+  // --- TIMER ---
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => setTimer((t) => t - 1), 1000);
     }
-    setLoading(false);
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  // --- HANDLERS ---
+  async function onEmailSubmit(data: z.infer<typeof emailSchema>) {
+    setLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Login failed", { description: "Invalid email or password." });
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Welcome back!");
+      router.refresh();
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error("Something went wrong");
+      setLoading(false);
+    }
+  }
+
+  async function onPhoneSubmit(data: z.infer<typeof phoneSchema>) {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: data.phone }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || "Failed to send OTP");
+
+      setPhone(data.phone);
+      setStep("otp");
+      setTimer(30);
+      toast.success("OTP sent!");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onOtpVerify(data: z.infer<typeof otpSchema>) {
+    setLoading(true);
+    try {
+      // Use NextAuth signIn with phone credential
+      const result = await signIn("credentials", {
+        phone: phone,
+        code: data.code,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Login failed", { description: "Invalid OTP or User not found." });
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Welcome back!");
+      router.refresh();
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error("Something went wrong");
+      setLoading(false);
+    }
   }
 
   return (
-    <main className="min-h-screen bg-white md:bg-gray-50 flex items-center justify-center p-0 md:p-6 lg:p-10">
+    <div className="min-h-screen w-full flex bg-[#F8FAFC]">
+      {/* ================= LEFT PANEL (Form) ================= */}
+      <div className="w-full lg:w-[45%] flex flex-col justify-between p-6 md:p-12 lg:p-16 relative bg-white lg:bg-transparent z-10">
 
-      <div className="w-full max-w-[1440px] bg-white rounded-none md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex min-h-screen md:min-h-[800px]">
-
-        {/* ================= FORM LEFT PANEL ================= */}
-        <div className="w-full lg:w-1/2 p-8 md:p-16 lg:p-24 flex flex-col justify-center">
-
-          <div className="max-w-[440px] mx-auto w-full">
-            <Link href="/" className="inline-block mb-10">
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg">E</div>
-                <span className="font-bold text-2xl tracking-tight">EventMate</span>
-              </div>
-            </Link>
-
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-            <p className="text-gray-500 mb-8">Please enter your details to sign in.</p>
-
-            {/* ROLE TOGGLE */}
-            <div className="mb-8 flex gap-1 bg-gray-100 p-1 rounded-xl">
-              <button
-                type="button"
-                onClick={() => setRole("user")}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${role === "user"
-                    ? "bg-white text-black shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-200/50"
-                  }`}
-              >
-                <Search className="w-4 h-4" />
-                Customer
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("vendor")}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${role === "vendor"
-                    ? "bg-white text-black shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-200/50"
-                  }`}
-              >
-                <Briefcase className="w-4 h-4" />
-                Vendor
-              </button>
-            </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700">Email Address</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3.5 top-3 w-5 h-5 text-gray-400" />
-                          <Input placeholder="name@example.com" type="email" className="pl-11 h-11" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-gray-700">Password</FormLabel>
-                        <Link
-                          href="/auth/forgot-password"
-                          className="text-xs font-semibold text-black hover:underline"
-                        >
-                          Forgot password?
-                        </Link>
-                      </div>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" className="h-11" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button className="w-full h-12 text-base font-medium bg-black hover:bg-gray-900 text-white shadow-lg shadow-black/20 transition-all" type="submit" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign in"}
-                </Button>
-
-                <div className="relative my-8">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400">Or continue with</span></div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <button type="button" className="h-11 flex items-center justify-center gap-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition font-medium text-sm">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                    Google
-                  </button>
-                  <button type="button" className="h-11 flex items-center justify-center gap-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition font-medium text-sm">
-                    <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.35-1.09-.56-2.09-.48-3.08.35 1.04 1.39 2.05 2.16 3.08 2.16s2.05-.77 3.08-2.16zM13.25 1c-1.39 1.12-1.92 2.52-1.28 4.24 1.58-.33 2.76-1.57 2.37-3.66-.99.07-1.54.3-1.09-.58zm5.66 18.28c1.39-4.25-1.12-6.52-2.31-7.16 1.39-.77 2.31-2.52 1.39-4.79-.88-2.52-3.85-3.66-6.16-2.52-1.92.58-1.54 2.52-1.39.07-.33-.33-.66-.66.07-.98.77-1.92 3.85-2.52 6.16.07 2.52-2.31 4.79.07 7.16 1.39 1.12 1.92 2.52 2.31 4.24-.07 1.39.58 1.92 1.39 0 .58.55.98 1.54.55.98-.33.33-.66.07-.98zM8.33 3.52c-.88 2.52 1.12 6.52 4.24 8.09 3.08 1.57 6.16 2.52 8.09.58-1.93 1.94-5.01-1.01-8.09-2.58-3.12-1.57-5.12-5.57-4.24-8.09z" /></svg>
-                    Apple
-                  </button>
-                </div>
-
-                <p className="mt-8 text-center text-sm text-gray-500">
-                  Don't have an account?{" "}
-                  <Link href="/auth/signup" className="font-bold text-black hover:underline">
-                    Create account
-                  </Link>
-                </p>
-              </form>
-            </Form>
-          </div>
+        {/* Header / Logo */}
+        <div>
+          <Link href="/" className="inline-block transition-transform hover:scale-105 active:scale-95 duration-200">
+            <Logo size="lg" />
+          </Link>
         </div>
 
-        {/* ================= IMAGE RIGHT PANEL ================= */}
-        <div className="hidden lg:block w-1/2 relative bg-gray-900">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-80"
-            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2969&auto=format&fit=crop')` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        {/* Form Container */}
+        <div className="max-w-md w-full mx-auto my-10">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">Welcome back</h1>
+            <p className="text-slate-500 text-lg">access your account instantly.</p>
+          </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-20 text-white">
-            <div className="mb-6 flex gap-1">
+          <Tabs defaultValue="email" className="w-full mb-8" onValueChange={(val) => setLoginMethod(val as any)}>
+            <TabsList className="grid w-full grid-cols-2 h-14 bg-slate-100 p-1.5 rounded-xl">
+              <TabsTrigger value="phone" className="rounded-lg font-semibold h-full data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Phone Login
+              </TabsTrigger>
+              <TabsTrigger value="email" className="rounded-lg font-semibold h-full data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Email Login
+              </TabsTrigger>
+            </TabsList>
+
+            {/* --- PHONE LOGIN --- */}
+            <TabsContent value="phone" className="mt-6">
+              <AnimatePresence mode="wait">
+                {step === "phone" ? (
+                  <motion.div
+                    key="step-phone"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                  >
+                    <Form {...phoneForm}>
+                      <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-5">
+                        <FormField
+                          control={phoneForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-medium">Mobile Number</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Phone className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                                  <Input placeholder="9876543210" className="pl-12 h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 rounded-xl" {...field} />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl mt-2" type="submit" disabled={loading}>
+                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Get OTP"}
+                        </Button>
+                      </form>
+                    </Form>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="step-otp"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
+                    <Form {...otpForm}>
+                      <form onSubmit={otpForm.handleSubmit(onOtpVerify)} className="space-y-5">
+                        <FormField
+                          control={otpForm.control}
+                          name="code"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-medium">One-Time Password</FormLabel>
+                              <FormControl>
+                                <Input placeholder="• • • • • •" maxLength={6} className="text-center text-xl tracking-widest h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 rounded-xl" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="flex flex-col gap-3">
+                          <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl mt-2" type="submit" disabled={loading}>
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Login"}
+                          </Button>
+                          <div className="flex justify-between items-center text-sm">
+                            <button type="button" onClick={() => setStep("phone")} className="text-slate-500 hover:text-slate-900 flex items-center gap-1">
+                              <ArrowLeft className="w-4 h-4" /> Change Number
+                            </button>
+                            <button
+                              type="button"
+                              disabled={timer > 0}
+                              onClick={() => phoneForm.handleSubmit(onPhoneSubmit)()}
+                              className={`font-semibold ${timer > 0 ? "text-slate-400 cursor-not-allowed" : "text-violet-700 hover:underline"}`}
+                            >
+                              Resend OTP {timer > 0 && `(${timer}s)`}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </Form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </TabsContent>
+
+            {/* --- EMAIL LOGIN --- */}
+            <TabsContent value="email" className="mt-6">
+              <Form {...emailForm}>
+                <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-5">
+                  <FormField
+                    control={emailForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                        <FormControl>
+                          <div className="relative group">
+                            <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-violet-600 transition-colors" />
+                            <Input
+                              placeholder="name@example.com"
+                              type="email"
+                              className="pl-12 h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all rounded-xl shadow-sm"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={emailForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                          <Link
+                            href="/auth/forgot-password"
+                            className="text-sm font-semibold text-violet-600 hover:text-violet-700 hover:underline"
+                          >
+                            Forgot password?
+                          </Link>
+                        </div>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all rounded-xl shadow-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/20 active:scale-[0.98] transition-all rounded-xl mt-2"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing in..." : "Sign in"}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
+
+          <p className="mt-8 text-center text-sm text-slate-500 font-medium">
+            Don't have an account?{" "}
+            <Link href="/auth/signup" className="text-violet-700 hover:text-violet-800 hover:underline font-semibold">
+              Create account
+            </Link>
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="text-xs text-slate-400 flex gap-4 mt-auto">
+          <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms of Service</Link>
+        </div>
+      </div>
+
+      {/* ================= RIGHT PANEL (Image/Brand) ================= */}
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-violet-900">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop')` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/90 to-indigo-900/90" />
+
+        {/* Abstract Shapes Decoration */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+
+        <div className="relative z-10 w-full h-full flex flex-col justify-center px-16 xl:px-24">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl shadow-2xl max-w-xl">
+            <div className="flex gap-1 mb-6">
               {[1, 2, 3, 4, 5].map(i => (
-                <svg key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg key={i} className="w-5 h-5 text-amber-400 fill-amber-400 drop-shadow-sm" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               ))}
             </div>
-            <blockquote className="text-2xl font-medium leading-relaxed mb-6">
-              "EventMate transformed how we find clients. The zero commission model is a game changer for our business."
+            <blockquote className="text-2xl font-medium leading-relaxed text-white mb-6 font-serif opacity-95">
+              "We've scaled our event business by 300% since joining EventMate. The platform is intuitive, and the leads are incredibly high quality."
             </blockquote>
-            <div>
-              <p className="font-bold text-lg">Aisha Sharma</p>
-              <p className="text-white/70">Top Rated Wedding Planner, Mumbai</p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-indigo-200 border-2 border-white/30 flex items-center justify-center font-bold text-violet-900">AS</div>
+              <div>
+                <p className="font-bold text-lg text-white">Anjali Singh</p>
+                <p className="text-indigo-200 text-sm">Founder, Royal Weddings</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 flex gap-8">
+            <div className="flex items-center gap-3 text-white/80">
+              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="font-bold text-white text-lg">10k+</p>
+                <p className="text-xs">Verified Vendors</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-white/80">
+              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="font-bold text-white text-lg">50k+</p>
+                <p className="text-xs">Successful Events</p>
+              </div>
             </div>
           </div>
         </div>
-
       </div>
-    </main>
+    </div>
   );
 }

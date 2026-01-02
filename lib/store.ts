@@ -106,116 +106,23 @@ interface VendorState {
 // --- INITIAL MOCK DATA ---
 
 const INITIAL_PROFILE: VendorProfile = {
-    businessName: "LensQueue Photography",
-    ownerName: "Aditya Roy",
-    email: "contact@lensqueue.com",
-    phone: "+91 98765 00000",
-    category: "Photography & Videography",
-    location: "Mumbai, Maharashtra",
-    about: "Premium wedding photography services specializing in candid and cinematic styles.",
-    services: ["Candid Photography", "Wedding Cinema", "Pre-Wedding Shoots", "Drone Coverage", "Albums"]
+    businessName: "",
+    ownerName: "",
+    email: "",
+    phone: "",
+    category: "",
+    location: "",
+    about: "",
+    services: []
 };
 
-const INITIAL_LEADS: Lead[] = [
-    {
-        id: "1",
-        name: "Ananya Sharma",
-        eventType: "Wedding Photography",
-        date: addDays(new Date(), 14).toISOString(),
-        guests: 350,
-        budget: "150000",
-        location: "Udaipur",
-        status: "New",
-        recievedAt: subDays(new Date(), 0).toISOString(),
-        phone: "+91 98765 43210",
-        email: "ananya.s@gmail.com",
-    },
-    {
-        id: "2",
-        name: "Rohit Verma",
-        eventType: "Corporate Event",
-        date: addDays(new Date(), 5).toISOString(),
-        guests: 120,
-        budget: "80000",
-        location: "Delhi NCR",
-        status: "Contacted",
-        recievedAt: subDays(new Date(), 1).toISOString(),
-        phone: "+91 98123 45678",
-        email: "rohit.v@corp.com",
-    },
-    {
-        id: "3",
-        name: "Priya & Rahul",
-        eventType: "Pre-Wedding Shoot",
-        date: addDays(new Date(), 25).toISOString(),
-        guests: 0,
-        budget: "40000",
-        location: "Mumbai",
-        status: "Quoted",
-        recievedAt: subDays(new Date(), 2).toISOString(),
-        phone: "+91 99988 77766",
-        email: "priya.rahul@gmail.com",
-    },
-    {
-        id: "4",
-        name: "Vikram Malhotra",
-        eventType: "Store Launch",
-        date: addDays(new Date(), 2).toISOString(),
-        guests: 50,
-        budget: "25000",
-        location: "Bangalore",
-        status: "Won",
-        recievedAt: subDays(new Date(), 5).toISOString(),
-        phone: "+91 88888 77777",
-        email: "vikram@brand.com",
-    },
-];
+const INITIAL_LEADS: Lead[] = [];
 
-const INITIAL_QUOTES: QuoteTemplate[] = [
-    {
-        id: "1",
-        name: "Wedding Premium Package",
-        category: "Photography",
-        price: 150000,
-        priceParams: "base price",
-        inclusions: ["Candid Photography", "Cinematic Video", "Drone Coverage", "300 Edited Photos", "Album"],
-        lastUsed: subDays(new Date(), 2).toISOString(),
-    },
-    {
-        id: "2",
-        name: "Standard Birthday",
-        category: "Photography",
-        price: 25000,
-        priceParams: "per day",
-        inclusions: ["4 Hours Coverage", "Unlimited Soft Copies", "Highlights Video"],
-        lastUsed: subDays(new Date(), 7).toISOString(),
-    },
-];
+const INITIAL_QUOTES: QuoteTemplate[] = [];
 
-const INITIAL_OFFERS: Offer[] = [
-    {
-        id: "1",
-        title: "Weekday Wedding Special",
-        type: "weekday",
-        value: "15% OFF",
-        condition: "Valid for Mon-Thu bookings",
-        status: "active",
-    },
-    {
-        id: "2",
-        title: "Last Minute Deal",
-        type: "last_minute",
-        value: "Flat ₹5,000 OFF",
-        condition: "Bookings within 7 days",
-        status: "active",
-    },
-];
+const INITIAL_OFFERS: Offer[] = [];
 
-const INITIAL_PORTFOLIO: PortfolioItem[] = [
-    { id: "1", type: "image", url: "bg-red-100", category: "Wedding", likes: 45 },
-    { id: "2", type: "image", url: "bg-blue-100", category: "Pre-Wedding", likes: 112 },
-    { id: "3", type: "video", url: "bg-gray-800", category: "Teaser", likes: 89 },
-];
+const INITIAL_PORTFOLIO: PortfolioItem[] = [];
 
 // --- STORE ---
 

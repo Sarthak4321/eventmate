@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 export default function VendorNavbar() {
   const [open, setOpen] = useState(false);
@@ -11,9 +12,8 @@ export default function VendorNavbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
-          <span className="font-semibold text-lg">EventMate</span>
+        <Link href="/" className="inline-block transition-transform hover:scale-105 active:scale-95 duration-200">
+          <Logo size="md" />
         </Link>
 
         {/* NAV LINKS */}

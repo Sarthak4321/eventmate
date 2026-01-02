@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { Mail, Lock, User, Phone, Briefcase, MapPin, Building2, CheckCircle2, ArrowRight } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -18,246 +19,282 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select } from "@/components/ui/select";
-import { CheckCircle2 } from "lucide-react";
+import { Select } from "@/components/ui/select"; // Ensure you have this component or use standard select
+import { Logo } from "@/components/ui/logo";
 
-// ================= USER SCHEMA =================
+// --- SCHEMAS ---
 const userSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  gender: z.string().min(1, "Please select gender"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
+  gender: z.string().min(1, "Please select gender"),
 });
 
-// ================= VENDOR SCHEMA =================
 const vendorSchema = z.object({
   businessName: z.string().min(2, "Business name is required"),
   category: z.string().min(1, "Service category is required"),
+  gstin: z.string().optional(),
+  pan: z.string().min(10, "Valid PAN is required"),
+
+  fullName: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  gstin: z.string().optional(), // Made optional for now, can be required
-  pan: z.string().min(10, "Valid PAN is required for verification"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
-  city: z.string().min(2, "City is required"),
-  experience: z.string().min(1, "Select experience"),
+  address: z.string().optional(),
+  city: z.string().min(1, "City is required"),
+
+  experience: z.string().min(1, "Experience is required"),
+  teamSize: z.string().min(1, "Team size is required"),
   startingPrice: z.string().min(1, "Starting price is required"),
-  teamSize: z.string().min(1, "Select team size"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
+  portfolio: z.string().optional(),
 });
 
 export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // --- USER FORM ---
+  // --- FORMS ---
   const userForm = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
-    defaultValues: { fullName: "", email: "", phone: "", gender: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      password: "",
+      gender: "",
+    },
   });
 
-  // --- VENDOR FORM ---
   const vendorForm = useForm<z.infer<typeof vendorSchema>>({
     resolver: zodResolver(vendorSchema),
     defaultValues: {
       businessName: "",
       category: "",
-      email: "",
-      phone: "",
       gstin: "",
       pan: "",
+      fullName: "",
+      email: "",
+      phone: "",
       password: "",
-      confirmPassword: "",
+      address: "",
       city: "",
       experience: "",
-      startingPrice: "",
       teamSize: "",
+      startingPrice: "",
+      portfolio: "",
     },
   });
 
-  async function onUserSubmit(data: z.infer<typeof userSchema>) {
+  // --- HANDLERS ---
+  async function onRegisterUser(data: z.infer<typeof userSchema>) {
     setLoading(true);
-    // Simulate API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, role: "user" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message);
 
-    localStorage.setItem("eventmate_role", "user");
-    toast.success("Account created successfully!");
-    router.push("/dashboard");
-    setLoading(false);
+      toast.success("Account created successfully!");
+      router.push("/auth/login");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function onVendorSubmit(data: z.infer<typeof vendorSchema>) {
+  async function onRegisterVendor(data: z.infer<typeof vendorSchema>) {
     setLoading(true);
-    // Simulate API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, role: "vendor" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message);
 
-    localStorage.setItem("eventmate_role", "vendor");
-    toast.success("Application submitted!", {
-      description: "Welcome to EventMate for Business.",
-    });
-    router.push("/vendor/dashboard");
-    setLoading(false);
+      toast.success("Account created successfully!");
+      router.push("/auth/login");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6 py-24">
-      <div className="w-full max-w-2xl bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
+    <div className="min-h-screen w-full flex bg-[#F8FAFC]">
+      {/* ================= FORM PANEL ================= */}
+      <div className="w-full h-full min-h-screen flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 relative bg-white z-10 w-full">
 
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-block mb-6">
-            <div className="flex items-center gap-2 justify-center">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg">E</div>
-              <span className="font-bold text-xl tracking-tight">EventMate</span>
-            </div>
+        {/* Header / Logo */}
+        <div className="w-full max-w-2xl text-center mb-6">
+          <Link href="/" className="inline-block transition-transform hover:scale-105 active:scale-95 duration-200">
+            <Logo size="lg" />
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Create your account</h1>
-          <p className="text-gray-500 mt-2">Join thousands of planners and vendors today.</p>
         </div>
 
-        <Tabs defaultValue="user" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8 h-14 bg-gray-100/50 p-1.5 rounded-2xl">
-            <TabsTrigger
-              value="user"
-              className="rounded-xl text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all h-full"
-            >
-              🎉 I'm Planning an Event
-            </TabsTrigger>
-            <TabsTrigger
-              value="vendor"
-              className="rounded-xl text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all h-full"
-            >
-              🏢 I'm a Vendor
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content Area */}
+        <div className="max-w-2xl w-full mx-auto my-4">
+          <div className="mb-10 text-center">
+            <h1 className="text-3xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">Create an account</h1>
+            <p className="text-slate-500 text-lg">Join EventMate to plan or manage events.</p>
+          </div>
 
-          {/* ================ USER TAB ================ */}
-          <TabsContent value="user" className="animate-in fade-in slide-in-from-top-4 duration-300">
-            <Form {...userForm}>
-              <form onSubmit={userForm.handleSubmit(onUserSubmit)} className="space-y-5">
-                <FormField
-                  control={userForm.control}
-                  name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <Tabs defaultValue="user" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-10 h-14 bg-slate-100 p-1.5 rounded-xl">
+              <TabsTrigger value="user" className="rounded-lg font-semibold h-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Customer</TabsTrigger>
+              <TabsTrigger value="vendor" className="rounded-lg font-semibold h-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Partner (Vendor)</TabsTrigger>
+            </TabsList>
 
-                <div className="grid md:grid-cols-2 gap-5">
+            {/* --- USER FORM --- */}
+            <TabsContent value="user">
+              <Form {...userForm}>
+                <form onSubmit={userForm.handleSubmit(onRegisterUser)} className="space-y-6">
+
                   <FormField
                     control={userForm.control}
-                    name="email"
+                    name="fullName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel className="text-slate-700 font-medium">Full Name</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="john@example.com" {...field} />
+                          <div className="relative group">
+                            <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                            <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="John Doe" {...field} />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={userForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+91 98765 00000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
-                <FormField
-                  control={userForm.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Gender</FormLabel>
-                      <FormControl>
-                        <Select {...field}>
-                          <option value="">Select Gender...</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="other">Other</option>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <FormField
+                      control={userForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="john@example.com" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={userForm.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Phone</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Phone className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="9876543210" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                <div className="grid md:grid-cols-2 gap-5">
-                  <FormField
-                    control={userForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={userForm.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <FormField
+                      control={userForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input type="password" className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="••••••••" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={userForm.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Gender</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 bg-slate-50 border border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl appearance-none outline-none transition-all text-slate-700 cursor-pointer"
+                                {...field}
+                              >
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                              </select>
+                              <ArrowRight className="absolute right-4 top-4 w-4 h-4 text-slate-500 rotate-90 pointer-events-none" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                <Button className="w-full h-12 text-base mt-2" type="submit" disabled={loading}>
-                  {loading ? "Creating Account..." : "Create User Account"}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
+                  <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg mt-4 transition-all active:scale-[0.98]" type="submit" disabled={loading}>
+                    {loading ? "Creating Account..." : "Sign Up"}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
 
-          {/* ================ VENDOR TAB ================ */}
-          <TabsContent value="vendor" className="animate-in fade-in slide-in-from-top-4 duration-300">
-            <Form {...vendorForm}>
-              <form onSubmit={vendorForm.handleSubmit(onVendorSubmit)} className="space-y-5">
+            {/* --- VENDOR FORM --- */}
+            <TabsContent value="vendor">
+              <Form {...vendorForm}>
+                <form onSubmit={vendorForm.handleSubmit(onRegisterVendor)} className="space-y-8">
 
-                {/* BUSINESS INFO */}
-                <div className="space-y-5">
-                  <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 space-y-4">
-                    <h3 className="font-semibold text-indigo-900 border-b border-indigo-200 pb-2">Verified Business Details</h3>
-                    <div className="grid md:grid-cols-2 gap-5">
+                  {/* Section 1: Business Verification Details (Highlighted) */}
+                  <div className="bg-violet-50/50 border border-violet-100 p-6 rounded-2xl shadow-sm space-y-4">
+                    <h3 className="text-lg font-bold text-violet-900 flex items-center gap-2 mb-2">
+                      <Briefcase className="w-5 h-5" /> Business Verification
+                    </h3>
+
+                    <FormField
+                      control={vendorForm.control}
+                      name="businessName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Business Name <span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Building2 className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
+                              <Input className="pl-10 h-11 rounded-xl bg-white border-slate-200 focus:border-violet-500 transition-all" placeholder="Starlight Studios" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={vendorForm.control}
-                        name="businessName"
+                        name="gstin"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Business Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Starlight Studios" {...field} />
-                            </FormControl>
+                            <FormLabel className="text-slate-700 font-medium">GSTIN (Optional)</FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-white border-slate-200 focus:border-violet-500 transition-all uppercase" placeholder="22AAAAA0000A1Z5" {...field} /></FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -267,10 +304,173 @@ export default function SignupPage() {
                         name="pan"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>PAN Number (Verification)</FormLabel>
+                            <FormLabel className="text-slate-700 font-medium">PAN Number <span className="text-red-500">*</span></FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-white border-slate-200 focus:border-violet-500 transition-all uppercase" placeholder="ABCDE1234F" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={vendorForm.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Category <span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <select className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl focus:border-violet-500 transition-all text-slate-700 cursor-pointer" {...field}>
+                              <option value="">Select Category</option>
+                              <option>Wedding Venue</option>
+                              <option>Photography</option>
+                              <option>Makeup Artist</option>
+                              <option>Catering</option>
+                              <option>Decor</option>
+                              <option>Entertainment</option>
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Section 2: Contact Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 border-b pb-2">
+                      Personal Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FormField
+                        control={vendorForm.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Your Name <span className="text-red-500">*</span></FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="John Doe" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={vendorForm.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Phone <span className="text-red-500">*</span></FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="9876543210" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FormField
+                        control={vendorForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Email <span className="text-red-500">*</span></FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="business@example.com" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={vendorForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Password <span className="text-red-500">*</span></FormLabel>
+                            <FormControl><Input type="password" className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="••••••••" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section 3: Service Details */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 border-b pb-2">
+                      Service Details
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FormField
+                        control={vendorForm.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">City <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                              <Input placeholder="ABCDE1234F" className="uppercase" {...field} />
+                              <div className="relative group">
+                                <MapPin className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                                <Input className="pl-10 h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="Mumbai" {...field} />
+                              </div>
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={vendorForm.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Full Address (Optional)</FormLabel>
+                            <FormControl><Input className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="Shop 12, Main Street..." {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={vendorForm.control}
+                        name="experience"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Experience</FormLabel>
+                            <FormControl>
+                              <select className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-violet-500 transition-all text-slate-700 cursor-pointer" {...field}>
+                                <option value="">Select...</option>
+                                <option>0-2 Years</option>
+                                <option>2-5 Years</option>
+                                <option>5+ Years</option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={vendorForm.control}
+                        name="teamSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Team Size</FormLabel>
+                            <FormControl>
+                              <select className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-violet-500 transition-all text-slate-700 cursor-pointer" {...field}>
+                                <option value="">Select...</option>
+                                <option>Solo</option>
+                                <option>2-10</option>
+                                <option>10+</option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={vendorForm.control}
+                        name="startingPrice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-medium">Min Price (₹)</FormLabel>
+                            <FormControl><Input type="number" className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" {...field} /></FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -278,185 +478,35 @@ export default function SignupPage() {
                     </div>
                     <FormField
                       control={vendorForm.control}
-                      name="gstin"
+                      name="portfolio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>GSTIN (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="22AAAAA0000A1Z5" className="uppercase" {...field} />
-                          </FormControl>
+                          <FormLabel className="text-slate-700 font-medium">Portfolio / Website (Optional)</FormLabel>
+                          <FormControl><Input className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="https://..." {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <FormField
-                      control={vendorForm.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Category</FormLabel>
-                          <FormControl>
-                            <Select {...field}>
-                              <option value="">Select Service...</option>
-                              <option>Wedding Venue</option>
-                              <option>Photography</option>
-                              <option>Makeup Artist</option>
-                              <option>Catering</option>
-                              <option>Decor</option>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={vendorForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Business Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="contact@business.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={vendorForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+91 98765 43210" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg mt-8 transition-all active:scale-[0.98]" type="submit" disabled={loading}>
+                    {loading ? "Creating Partner Account..." : "Join as Vendor"}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
 
-                  <FormField
-                    control={vendorForm.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City / Base Location</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. Mumbai, Delhi" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+          <p className="mt-8 text-center text-sm text-slate-500 font-medium">
+            Already have an account?{" "}
+            <Link href="/auth/login" className="text-violet-700 hover:text-violet-800 hover:underline font-semibold">
+              Log in
+            </Link>
+          </p>
+        </div>
 
-                <div className="h-px bg-gray-100 my-6" />
-
-                {/* DETAILS & CREDENTIALS */}
-                <div className="grid md:grid-cols-3 gap-5">
-                  <FormField
-                    control={vendorForm.control}
-                    name="experience"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Experience</FormLabel>
-                        <FormControl>
-                          <Select {...field}>
-                            <option value="">Select...</option>
-                            <option>0-2 Years</option>
-                            <option>2-5 Years</option>
-                            <option>5+ Years</option>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vendorForm.control}
-                    name="startingPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Start Price (₹)</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="25000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vendorForm.control}
-                    name="teamSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Team Size</FormLabel>
-                        <FormControl>
-                          <Select {...field}>
-                            <option value="">Select...</option>
-                            <option>Solo</option>
-                            <option>2-10</option>
-                            <option>10+</option>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-5">
-                  <FormField
-                    control={vendorForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vendorForm.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="text-sm text-gray-500 bg-gray-50 p-4 rounded-xl flex gap-3">
-                  <div className="min-w-5 pt-0.5"><CheckCircle2 className="w-5 h-5 text-green-600" /></div>
-                  <p>By registering, you agree to undergo our simplified verification process to trust. No hidden joining fees.</p>
-                </div>
-
-                <Button className="w-full h-12 text-base" type="submit" disabled={loading}>
-                  {loading ? "Submitting Application..." : "Join as Vendor"}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
-        </Tabs>
-
-        <p className="mt-8 text-center text-sm text-gray-500">
-          Already have an account? <Link href="/auth/login" className="font-semibold text-black hover:underline">Log in</Link>
-        </p>
-
+        {/* Footer */}
       </div>
-    </main>
+    </div>
   );
 }

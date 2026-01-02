@@ -8,6 +8,13 @@
     /* #F7F7FB */
     --foreground: 15 23 42;
   }
+
+  .dark {
+    --background: 17 24 39;
+    /* gray-900 */
+    --foreground: 249 250 251;
+    /* gray-50 */
+  }
 }
 
 body {

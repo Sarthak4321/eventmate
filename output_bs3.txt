@@ -1,0 +1,12 @@
+Connecting to: D:\eventmate\eventmate\dev.db
+Connection failed: TypeError: Cannot read properties of undefined (reading 'replace')
+    at createBetterSQLite3Client (D:\eventmate\eventmate\node_modules\@prisma\adapter-better-sqlite3\dist\index.js:648:22)
+    at PrismaBetterSqlite3AdapterFactory.connect (D:\eventmate\eventmate\node_modules\@prisma\adapter-better-sqlite3\dist\index.js:637:59)
+    at Function.connect (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\engines\client\LocalExecutor.ts:42:58)
+    at Dt.#connectExecutor (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\engines\client\ClientEngine.ts:220:34)
+    at callback (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\engines\client\ClientEngine.ts:169:35)
+    at Object.runInChildSpan (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\tracing\TracingHelper.ts:28:12)
+    at ti.runInChildSpan (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\tracing\TracingHelper.ts:53:36)
+    at Dt.#ensureStarted (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\engines\client\ClientEngine.ts:164:47)
+    at Dt.start (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\core\engines\client\ClientEngine.ts:356:16)
+    at Proxy.$connect (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:433:29)

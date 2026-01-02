@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export default function MainNavbar() {
   const [open, setOpen] = useState(false);
@@ -13,11 +14,8 @@ export default function MainNavbar() {
         <div className="flex items-center justify-between rounded-full bg-white/70 backdrop-blur-xl border shadow-sm px-5 py-3">
 
           {/* LOGO */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
-            <span className="font-semibold text-lg tracking-tight">
-              EventMate
-            </span>
+          <Link href="/" className="inline-block transition-transform hover:scale-105 active:scale-95 duration-200">
+            <Logo size="md" />
           </Link>
 
           {/* DESKTOP NAV */}

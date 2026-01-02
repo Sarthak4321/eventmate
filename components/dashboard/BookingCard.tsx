@@ -53,7 +53,7 @@ export function BookingCard({ booking }: { booking: BookingProps }) {
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-xs font-medium text-purple-600 uppercase tracking-wider mb-1">{booking.category}</p>
-                            <h3 className="text-xl font-bold text-gray-900 font-serif leading-tight">{booking.serviceName}</h3>
+                            <h3 className="text-xl font-bold text-gray-900 leading-tight">{booking.serviceName}</h3>
                         </div>
                         <span className={`hidden sm:inline-block px-3 py-1 rounded-full text-xs font-semibold border ${statusStyles[booking.status]}`}>
                             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}

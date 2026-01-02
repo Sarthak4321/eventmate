@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String?        @unique
+  password      String?
+  role          String         @default("user")
+  fullName      String?
+  phone         String         @unique
+  gender        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  vendorProfile VendorProfile?
+  bookings      Booking[]
+  savedVendors  SavedVendor[]
+  notifications Notification[]
+  settings      UserSettings?
+}
+
+model VendorProfile {
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  businessName  String
+  category      String
+  phone         String?
+  gstin         String?
+  pan           String
+  city          String
+  experience    String
+  startingPrice String
+  teamSize      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+  savedByUsers  SavedVendor[]
+}
+
+model Booking {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendorId  String
+  vendor    VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  date      DateTime
+  status    String        @default("pending") // pending, confirmed, completed, cancelled
+  eventType String?
+  location  String?
+  price     String?       // Storing as string to match existing frontend formatted price, or float
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model SavedVendor {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendorId  String
+  vendor    VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@unique([userId, vendorId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  type      String   @default("info") // info, success, warning, error
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model UserSettings {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotif     Boolean @default(true)
+  pushNotif      Boolean @default(false)
+  marketingNotif Boolean @default(false)
+  darkMode       Boolean @default(false)
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

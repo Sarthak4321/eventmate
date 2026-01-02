@@ -1,0 +1,19 @@
+D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\utils\validatePrismaClientOptions.ts:239
+      throw new PrismaClientConstructorValidationError(
+            ^
+
+
+PrismaClientConstructorValidationError: Unknown property datasourceUrl provided to PrismaClient constructor.
+Read more at https://pris.ly/d/client-constructor
+    at validatePrismaClientOptions (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\utils\validatePrismaClientOptions.ts:239:13)
+    at new t (D:\eventmate\eventmate\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:281:7)
+    at <anonymous> (D:\eventmate\eventmate\test-prisma.ts:4:16)
+    at Object.<anonymous> (D:\eventmate\eventmate\test-prisma.ts:19:6)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object.transformer (C:\Users\91629\AppData\Local\npm-cache\_npx\fd45a72a545557e9\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+
+Node.js v22.19.0

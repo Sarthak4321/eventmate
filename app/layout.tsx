@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import SmoothScrolling from "@/components/SmoothScrolling";
 
+import { Providers } from "@/components/Providers";
+
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -21,7 +23,9 @@ export default function RootLayout({
       <body
         className={`${jakarta.variable} font-sans antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster position="top-right" richColors />
         <SmoothScrolling />
       </body>

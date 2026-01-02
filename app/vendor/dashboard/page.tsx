@@ -6,16 +6,24 @@ import clsx from "clsx";
 import { useVendorStore } from "@/lib/store";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { leads, profile } = useVendorStore();
   const [mounted, setMounted] = useState(false);
 
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+    }
+  }, [status, router]);
 
-  if (!mounted) {
+  if (!mounted || status === "loading") {
     return <div className="p-8">Loading dashboard...</div>;
   }
 

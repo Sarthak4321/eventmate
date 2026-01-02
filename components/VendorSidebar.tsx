@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/ui/logo";
 import {
     LayoutDashboard,
     MessageSquare,
@@ -32,10 +33,7 @@ export default function VendorSidebar() {
     return (
         <aside className="w-64 bg-white border-r h-screen fixed left-0 top-0 flex flex-col z-40">
             <div className="p-6 border-b flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-                    E
-                </div>
-                <span className="font-bold text-lg text-gray-900">EventMate</span>
+                <Logo size="md" />
             </div>
 
             <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">

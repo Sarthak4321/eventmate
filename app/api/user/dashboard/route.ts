@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; // Assuming authOptions is exported from here or similar, will check path
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
+
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);

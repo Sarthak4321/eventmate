@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email }
+            where: { id: session.user.id }
         });
 
         if (!user) {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         const hashedPassword = await hash(newPassword, 12);
 
         await prisma.user.update({
-            where: { email: session.user.email },
+            where: { id: session.user.id },
             data: { password: hashedPassword }
         });
 

@@ -27,22 +27,28 @@ export const authOptions: NextAuthOptions = {
                     })
 
                     if (!otpRecord || otpRecord.code !== credentials.code) {
-                        throw new Error("Invalid OTP")
+                        return null
                     }
 
                     if (new Date() > otpRecord.expiresAt) {
-                        throw new Error("OTP expired")
+                        return null
                     }
 
                     // Delete OTP after usage for security
                     await prisma.otp.delete({ where: { phone: credentials.phone } })
 
-                    const user = await prisma.user.findUnique({
+                    let user = await prisma.user.findUnique({
                         where: { phone: credentials.phone },
                     })
 
                     if (!user) {
-                        return null // User not found, should register
+                        // User not found, create new user (Auto-Signup)
+                        user = await prisma.user.create({
+                            data: {
+                                phone: credentials.phone,
+                                role: "user",
+                            }
+                        })
                     }
 
                     return {
@@ -92,26 +98,24 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async session({ session, token }) {
-            return {
-                ...session,
-                user: {
-                    ...session.user,
-                    id: token.id,
-                    role: token.role,
-                    gender: token.gender,
-                    phone: token.phone as string | null,
-                },
+            console.log("Session Callback - Token:", JSON.stringify(token, null, 2));
+            if (token) {
+                session.user.id = (token.id as string) || (token.sub as string);
+                session.user.role = token.role as string;
+                session.user.gender = token.gender as string | null | undefined;
+                session.user.phone = token.phone as string | null | undefined;
             }
+            return session;
         },
         async jwt({ token, user, trigger, session }) {
+            console.log("JWT Callback - User:", user ? "Present" : "Absent");
+            console.log("JWT Callback - Trigger:", trigger);
+
             if (user) {
-                return {
-                    ...token,
-                    id: user.id,
-                    role: user.role,
-                    gender: user.gender,
-                    phone: user.phone,
-                }
+                token.id = user.id;
+                token.role = user.role;
+                token.gender = user.gender;
+                token.phone = user.phone;
             }
             if (trigger === "update" && session) {
                 return { ...token, ...session.user }

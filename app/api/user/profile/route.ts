@@ -10,12 +10,12 @@ export async function GET() {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { id: session.user.id },
             select: {
                 fullName: true,
                 email: true,
@@ -41,7 +41,7 @@ export async function PATCH(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -49,7 +49,7 @@ export async function PATCH(req: Request) {
         const { fullName, phone, gender } = body;
 
         const updatedUser = await prisma.user.update({
-            where: { email: session.user.email },
+            where: { id: session.user.id },
             data: {
                 fullName,
                 phone,

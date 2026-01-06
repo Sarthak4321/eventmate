@@ -9,13 +9,13 @@ export const dynamic = "force-dynamic";
 export async function DELETE(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         // Delete user (cascade should handle related records like bookings, profile, etc.)
         await prisma.user.delete({
-            where: { email: session.user.email }
+            where: { id: session.user.id }
         });
 
         return NextResponse.json({ message: "Account deleted successfully" });

@@ -10,15 +10,13 @@ export async function GET() {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         const notifications = await prisma.notification.findMany({
             where: {
-                user: {
-                    email: session.user.email
-                }
+                userId: session.user.id
             },
             orderBy: {
                 createdAt: 'desc'

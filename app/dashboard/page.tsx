@@ -21,7 +21,7 @@ import {
 import { BookingCard, BookingProps } from "@/components/dashboard/BookingCard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function UserDashboard() {
@@ -45,6 +45,14 @@ export default function UserDashboard() {
     async function fetchDashboardData() {
       try {
         const res = await fetch("/api/user/dashboard");
+
+        if (res.status === 401 || res.status === 404) {
+          // Session is stale or invalid (user not in DB)
+          // We can manually redirect or let the effect handle it, but explicit signOut is safer if the cookie persists
+          await signOut({ callbackUrl: "/auth/login" });
+          return;
+        }
+
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
 

@@ -9,13 +9,15 @@ export const dynamic = "force-dynamic";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
+        console.log("Dashboard API Session:", JSON.stringify(session, null, 2));
 
-        if (!session || !session.user?.email) {
+        if (!session || !session.user?.id) {
+            console.log("Dashboard API: No session or user ID");
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { id: session.user.id },
             include: {
                 bookings: {
                     include: {
@@ -34,6 +36,7 @@ export async function GET() {
         });
 
         if (!user) {
+            console.log("Dashboard API: User not found in DB for ID:", session.user.id);
             return NextResponse.json({ message: "User not found" }, { status: 404 });
         }
 

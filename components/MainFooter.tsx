@@ -63,8 +63,8 @@ export default function MainFooter() {
           <div>
             <p className="text-white font-medium mb-3">Legal</p>
             <ul className="space-y-2">
-              <li>Privacy Policy</li>
-              <li>Terms of Service</li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

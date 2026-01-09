@@ -10,47 +10,52 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const { leads, profile } = useVendorStore();
-  const [mounted, setMounted] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    setMounted(true);
     if (status === "unauthenticated") {
       router.push("/auth/login");
+      return;
+    } else if (status === "authenticated" && session?.user?.role !== "vendor") {
+      router.push("/dashboard");
+      return;
     }
-  }, [status, router]);
 
-  if (!mounted || status === "loading") {
-    return <div className="p-8">Loading dashboard...</div>;
+    if (status === "authenticated") {
+      fetchDashboardData();
+    }
+  }, [status, router, session]);
+
+  async function fetchDashboardData() {
+    try {
+      const res = await fetch("/api/vendor/dashboard");
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // --- COMPUTED STATS ---
-  const newLeadsCount = leads.filter(l => l.status === "New").length;
-  const wonBookings = leads.filter(l => l.status === "Won").length;
+  if (status === "loading" || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
-  // Fake Revenue calc: Sum of won leads budget
-  const totalRevenue = leads
-    .filter(l => l.status === "Won")
-    .reduce((acc, curr) => {
-      // Simple parsing: remove non-digit/dot chars
-      const clean = curr.budget.replace(/[^0-9.]/g, '');
-      return acc + (parseFloat(clean) || 0);
-    }, 0);
+  const { stats, recentLeads, upcomingEvents, profile } = data || {};
 
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 3 }).format(val);
-
-  const upcomingEvents = leads
-    .filter(l => l.status === "Won")
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(0, 3);
-
-  const recentLeads = [...leads]
-    .sort((a, b) => new Date(b.recievedAt).getTime() - new Date(a.recievedAt).getTime())
-    .slice(0, 3);
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 3 }).format(val || 0);
 
   return (
     <div className="p-8 space-y-8">
@@ -59,11 +64,11 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">Good afternoon, {profile.businessName}!</p>
+          <p className="text-gray-500 mt-1">Good afternoon, {profile?.businessName || "Partner"}!</p>
         </div>
         <div className="flex gap-3">
           <Link href="/vendor/leads" className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm shadow-indigo-200">
-            View New Leads ({newLeadsCount})
+            View New Leads ({stats?.newLeads || 0})
           </Link>
         </div>
       </div>
@@ -71,9 +76,9 @@ export default function DashboardPage() {
       {/* STATS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Total Revenue", value: formatCurrency(totalRevenue), change: "+12%", icon: IndianRupee },
-          { label: "New Leads", value: newLeadsCount.toString(), change: "+5", icon: MessageSquare },
-          { label: "Bookings", value: wonBookings.toString(), change: "On track", icon: CheckCircle2 },
+          { label: "Total Revenue", value: formatCurrency(stats?.revenue), change: "+12%", icon: IndianRupee },
+          { label: "New Leads", value: (stats?.newLeads || 0).toString(), change: "+5", icon: MessageSquare },
+          { label: "Bookings", value: (stats?.bookings || 0).toString(), change: "On track", icon: CheckCircle2 },
           { label: "Profile Views", value: "1.2k", change: "+18%", icon: TrendingUp },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-6 rounded-2xl border shadow-sm">
@@ -107,26 +112,27 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-4">
-              {recentLeads.map((lead) => (
-                <div key={lead.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
-                      {lead.name[0]}
+              {recentLeads && recentLeads.length > 0 ? (
+                recentLeads.map((lead: any) => (
+                  <div key={lead.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                        {lead.name[0]}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition">{lead.name}</h4>
+                        <p className="text-xs text-gray-500">{lead.eventType} · {formatDistanceToNow(parseISO(lead.recievedAt), { addSuffix: true })}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition">{lead.name}</h4>
-                      <p className="text-xs text-gray-500">{lead.eventType} · {formatDistanceToNow(parseISO(lead.recievedAt), { addSuffix: true })}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {lead.status === "New" && (
+                    <div className="flex items-center gap-4">
                       <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide">New</span>
-                    )}
-                    <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600" />
+                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-600" />
+                    </div>
                   </div>
-                </div>
-              ))}
-              {recentLeads.length === 0 && <p className="text-gray-500 text-sm">No recent leads.</p>}
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No new inquiries yet.</p>
+              )}
             </div>
           </section>
 
@@ -157,8 +163,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-6">
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((ev) => (
+              {upcomingEvents && upcomingEvents.length > 0 ? (
+                upcomingEvents.map((ev: any) => (
                   <div key={ev.id} className="flex gap-4">
                     <div className="text-center w-12">
                       <p className="text-xs text-gray-500 uppercase font-bold">{new Date(ev.date).toLocaleString('default', { month: 'short' })}</p>

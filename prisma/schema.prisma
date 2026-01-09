@@ -40,6 +40,21 @@ model VendorProfile {
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookings      Booking[]
   savedByUsers  SavedVendor[]
+  quoteTemplates QuoteTemplate[]
+  about         String?
+  portfolio     PortfolioItem[]
+}
+
+model PortfolioItem {
+  id        String        @id @default(cuid())
+  vendorId  String
+  vendor    VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  type      String        // image, video
+  url       String
+  category  String?       // Wedding, Pre-Wedding, etc.
+  caption   String?
+  likes     Int           @default(0)
+  createdAt DateTime      @default(now())
 }
 
 model Booking {
@@ -94,4 +109,18 @@ model Otp {
   code      String
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model QuoteTemplate {
+  id          String        @id @default(cuid())
+  vendorId    String
+  vendor      VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name        String
+  category    String
+  price       Float
+  priceParams String
+  inclusions  String[]
+  lastUsed    DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }

@@ -1,15 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, FileText, Check, MoreVertical, Edit, Trash, X } from "lucide-react";
+import { Plus, FileText, Check, Trash, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useVendorStore, QuoteTemplate } from "@/lib/store";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import Modal from "@/components/Modal";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+interface QuoteTemplate {
+    id: string;
+    name: string;
+    category: string;
+    price: number;
+    priceParams: string; // "base price", "per day", etc
+    inclusions: string[];
+    lastUsed: string;
+}
 
 export default function QuotesPage() {
-    const { quotes, addQuote, deleteQuote } = useVendorStore();
-    const [mounted, setMounted] = useState(false);
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    const [quotes, setQuotes] = useState<QuoteTemplate[]>([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Form State
@@ -23,15 +37,47 @@ export default function QuotesPage() {
     });
 
     useEffect(() => {
-        setMounted(true);
-    }, []);
+        if (status === "unauthenticated") {
+            router.push("/auth/login");
+        } else if (status === "authenticated") {
+            if (session?.user?.role !== "vendor") {
+                router.push("/dashboard");
+            } else {
+                fetchQuotes();
+            }
+        }
+    }, [status, router, session]);
 
-    if (!mounted) return null;
+    async function fetchQuotes() {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/vendor/quotes");
+            if (res.ok) {
+                const data = await res.json();
+                setQuotes(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch quotes", error);
+            toast.error("Failed to load templates");
+        } finally {
+            setLoading(false);
+        }
+    }
 
-    const handleDelete = (id: string) => {
-        if (confirm("Are you sure you want to delete this template?")) {
-            deleteQuote(id);
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this template?")) return;
+
+        // Optimistic UI update
+        const originalQuotes = [...quotes];
+        setQuotes(prev => prev.filter(q => q.id !== id));
+
+        try {
+            const res = await fetch(`/api/vendor/quotes/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete");
             toast.success("Template deleted successfully");
+        } catch (error) {
+            setQuotes(originalQuotes);
+            toast.error("Failed to delete template");
         }
     };
 
@@ -53,38 +99,60 @@ export default function QuotesPage() {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.price || formData.inclusions.length === 0) {
             toast.error("Please fill in all required fields");
             return;
         }
 
-        const newQuote: QuoteTemplate = {
-            id: crypto.randomUUID(),
+        const payload = {
             name: formData.name,
             category: formData.category,
-            price: parseFloat(formData.price),
+            price: formData.price,
             priceParams: formData.priceParams,
-            inclusions: formData.inclusions,
-            lastUsed: new Date().toISOString()
+            inclusions: formData.inclusions
         };
 
-        addQuote(newQuote);
-        toast.success("Quote template created!");
-        setIsModalOpen(false);
-        setFormData({
-            name: "",
-            category: "Photography",
-            price: "",
-            priceParams: "base price",
-            inclusionInput: "",
-            inclusions: [],
-        });
+        try {
+            const res = await fetch("/api/vendor/quotes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const newQuote = await res.json();
+                setQuotes([newQuote, ...quotes]);
+                toast.success("Quote template created!");
+                setIsModalOpen(false);
+                setFormData({
+                    name: "",
+                    category: "Photography",
+                    price: "",
+                    priceParams: "base price",
+                    inclusionInput: "",
+                    inclusions: [],
+                });
+            } else {
+                toast.error("Failed to create template");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong");
+        }
     };
 
     const formatCurrency = (val: number) =>
         new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 3 }).format(val);
+
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            </div>
+        );
+    }
 
     return (
         <div className="p-8">

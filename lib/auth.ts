@@ -18,9 +18,57 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
                 phone: { label: "Phone", type: "text" },
                 code: { label: "OTP", type: "text" },
+                googleLogin: { label: "Google Login", type: "text" },
+                firebaseToken: { label: "Firebase Token", type: "text" },
             },
             async authorize(credentials) {
-                // --- PHONE + OTP LOGIN ---
+                // --- GOOGLE LOGIN (Trusted Client) ---
+                if (credentials?.googleLogin === "true" && credentials?.email) {
+                    const user = await prisma.user.findUnique({
+                        where: { email: credentials.email },
+                    })
+                    if (user) {
+                        return {
+                            id: user.id + "",
+                            email: user.email,
+                            name: user.fullName || user.email,
+                            role: user.role,
+                            gender: user.gender,
+                            phone: user.phone,
+                        }
+                    }
+                    return null;
+                }
+
+                // --- FIREBASE PHONE LOGIN (Trusted Client) ---
+                if (credentials?.phone && credentials?.firebaseToken) {
+                    let user = await prisma.user.findUnique({
+                        where: { phone: credentials.phone },
+                    })
+
+                    if (!user) {
+                        // Optional: Auto-create user if they passed verification but aren't in DB?
+                        // For now, return null to enforce signup flow logic or just return existing users.
+                        // User not found, create new user (Auto-Signup)
+                        user = await prisma.user.create({
+                            data: {
+                                phone: credentials.phone,
+                                role: "user",
+                            }
+                        })
+                    }
+
+                    return {
+                        id: user.id + "",
+                        email: user.email,
+                        name: user.fullName || user.phone,
+                        role: user.role,
+                        gender: user.gender,
+                        phone: user.phone,
+                    }
+                }
+
+                // --- LEGACY PHONE + OTP LOGIN (DB based) ---
                 if (credentials?.phone && credentials?.code) {
                     const otpRecord = await prisma.otp.findUnique({
                         where: { phone: credentials.phone },
@@ -53,8 +101,8 @@ export const authOptions: NextAuthOptions = {
 
                     return {
                         id: user.id + "",
-                        email: user.email, // might be null
-                        name: user.fullName || user.phone, // fallback to phone if no name
+                        email: user.email,
+                        name: user.fullName || user.phone,
                         role: user.role,
                         gender: user.gender,
                         phone: user.phone,

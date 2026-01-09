@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined;
+    prisma_new: PrismaClient | undefined;
 };
 
 // Prisma 7 with driver adapter
@@ -16,8 +16,8 @@ function createPrismaClient() {
 }
 
 export const prisma =
-    globalForPrisma.prisma ?? createPrismaClient();
+    globalForPrisma.prisma_new ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = prisma;
+    globalForPrisma.prisma_new = prisma;
 }

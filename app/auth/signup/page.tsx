@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Mail, Lock, User, Phone, Briefcase, MapPin, Building2, CheckCircle2, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, Phone, Briefcase, MapPin, Building2, CheckCircle2, ArrowRight, Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -53,8 +53,7 @@ const vendorSchema = z.object({
 export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"details" | "otp">("details");
-  const [otp, setOtp] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // --- FORMS ---
   const userForm = useForm<z.infer<typeof userSchema>>({
@@ -68,62 +67,109 @@ export default function SignupPage() {
     },
   });
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get("email");
+    const name = params.get("name");
+
+    if (email) userForm.setValue("email", email);
+    if (name) userForm.setValue("fullName", name);
+  }, []);
+
   // ... vendorForm ...
 
   // --- HANDLERS ---
-  async function onUserSignupStep1(data: z.infer<typeof userSchema>) {
+  async function handleGoogleLogin() {
     setLoading(true);
     try {
-      // 1. Send OTP
-      const res = await fetch("/api/auth/otp/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: data.phone }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.message);
+      const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
+      const { auth } = await import("@/lib/firebase");
+      const provider = new GoogleAuthProvider();
 
-      toast.success("OTP sent to " + data.phone);
-      setStep("otp");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (user.email) {
+        // Check if user exists in our DB
+        const res = await fetch("/api/auth/check-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email }),
+        });
+        const data = await res.json();
+
+        if (data.exists) {
+          toast.info("Account already exists. Logging you in...");
+          router.push("/auth/login"); // Or directly log them in via NextAuth if we implement token exchange
+          return;
+        }
+
+        // New User: Pre-fill form
+        toast.success("Google verification successful! Please complete your profile.");
+
+        // Determine current tab to pre-fill correct form
+        const activeTab = document.querySelector('[data-state="active"]')?.getAttribute('value') || "user";
+
+        if (activeTab === "user") {
+          userForm.setValue("email", user.email);
+          userForm.setValue("fullName", user.displayName || "");
+          // Logic to stay on form but with filled data
+        } else {
+          vendorForm.setValue("email", user.email);
+          vendorForm.setValue("fullName", user.displayName || "");
+        }
+      }
     } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP");
+      console.error(error);
+      toast.error(error.message || "Google Sign-In failed");
     } finally {
       setLoading(false);
     }
   }
 
-  async function onVerifyAndRegister() {
+  async function onUserSignup(data: z.infer<typeof userSchema>) {
     setLoading(true);
     try {
-      const formData = userForm.getValues();
+      // 1. Create User in Firebase
+      const { createUserWithEmailAndPassword, sendEmailVerification, updateProfile, signOut } = await import("firebase/auth");
+      const { auth } = await import("@/lib/firebase");
 
-      // 2. Verify OTP
-      const verifyRes = await fetch("/api/auth/otp/verify", {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      // 2. Send Verification Email
+      await sendEmailVerification(user);
+      await updateProfile(user, { displayName: data.fullName });
+
+      // 3. Create User in Database
+      const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: formData.phone, code: otp }),
+        body: JSON.stringify({
+          ...data,
+          role: "user",
+          // We can optionally store firebaseUid if schema supports it, but for now we sync email/phone
+        }),
       });
 
-      if (!verifyRes.ok) {
-        const json = await verifyRes.json();
-        throw new Error(json.message || "Invalid OTP");
+      const json = await res.json();
+      if (!res.ok) {
+        // If DB creation fails, we might want to clean up Firebase user, but for now we'll just throw
+        throw new Error(json.message);
       }
 
-      // 3. Register User
-      const registerRes = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, role: "user" }),
-      });
+      // 4. Force user to logout so they can't access app until they verify and re-login
+      await signOut(auth);
 
-      const registerJson = await registerRes.json();
-      if (!registerRes.ok) throw new Error(registerJson.message);
-
-      toast.success("Account verified & created!");
+      toast.success("Account created! Please check your email to verify your account.");
       router.push("/auth/login");
-
     } catch (error: any) {
-      toast.error(error.message || "Registration failed");
+      console.error(error);
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error("Email is already registered in our secure system.");
+      } else {
+        toast.error(error.message || "Registration failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -192,6 +238,25 @@ export default function SignupPage() {
             <p className="text-slate-500 text-lg">Join EventMate to plan or manage events.</p>
           </div>
 
+          <div className="mb-6">
+            <Button
+              onClick={handleGoogleLogin}
+              variant="outline"
+              className="w-full h-12 rounded-xl text-slate-700 font-semibold border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-3"
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+              Sign up with Google
+            </Button>
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-200"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-3 text-slate-400 font-medium">Or continue with</span>
+              </div>
+            </div>
+          </div>
+
           <Tabs defaultValue="user" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-10 h-14 bg-slate-100 p-1.5 rounded-xl">
               <TabsTrigger value="user" className="rounded-lg font-semibold h-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Customer</TabsTrigger>
@@ -200,152 +265,120 @@ export default function SignupPage() {
 
             {/* --- USER FORM --- */}
             <TabsContent value="user">
-              {step === "details" ? (
-                <Form {...userForm}>
-                  <form onSubmit={userForm.handleSubmit(onUserSignupStep1)} className="space-y-6">
+              <Form {...userForm}>
+                <form onSubmit={userForm.handleSubmit(onUserSignup)} className="space-y-6">
+                  <FormField
+                    control={userForm.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Full Name</FormLabel>
+                        <FormControl>
+                          <div className="relative group">
+                            <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                            <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="John Doe" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <FormField
                       control={userForm.control}
-                      name="fullName"
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">Full Name</FormLabel>
+                          <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
                           <FormControl>
                             <div className="relative group">
-                              <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
-                              <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="John Doe" {...field} />
+                              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="john@example.com" {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <FormField
-                        control={userForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
-                            <FormControl>
-                              <div className="relative group">
-                                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
-                                <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="john@example.com" {...field} />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={userForm.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">Phone</FormLabel>
-                            <FormControl>
-                              <div className="relative group">
-                                <Phone className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
-                                <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="9876543210" {...field} />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <FormField
-                        control={userForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
-                            <FormControl>
-                              <div className="relative group">
-                                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
-                                <Input type="password" className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="••••••••" {...field} />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={userForm.control}
-                        name="gender"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">Gender</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <select
-                                  className="w-full h-12 px-4 bg-slate-50 border border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl appearance-none outline-none transition-all text-slate-700 cursor-pointer"
-                                  {...field}
-                                >
-                                  <option value="">Select Gender</option>
-                                  <option value="male">Male</option>
-                                  <option value="female">Female</option>
-                                  <option value="other">Other</option>
-                                </select>
-                                <ArrowRight className="absolute right-4 top-4 w-4 h-4 text-slate-500 rotate-90 pointer-events-none" />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg mt-4 transition-all active:scale-[0.98]" type="submit" disabled={loading}>
-                      {loading ? "Sending OTP..." : "Continue"}
-                    </Button>
-                  </form>
-                </Form>
-              ) : (
-                <div className="max-w-md mx-auto py-6">
-                  <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-600">
-                      <Lock className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900">Enter OTP</h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                      We've sent a 6-digit code to <span className="font-semibold text-slate-900">{userForm.getValues("phone")}</span>
-                    </p>
+                    <FormField
+                      control={userForm.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Phone</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Phone className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input className="pl-12 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all" placeholder="9876543210" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
-                  <div className="space-y-6">
-                    <div>
-                      <Input
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                        placeholder="• • • • • •"
-                        className="text-center text-3xl tracking-[1em] h-16 font-semibold rounded-xl border-slate-200 focus:border-violet-500 bg-slate-50"
-                        maxLength={6}
-                      />
-                    </div>
-
-                    <div className="space-y-3">
-                      <Button
-                        onClick={onVerifyAndRegister}
-                        className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg transition-all active:scale-[0.98]"
-                        disabled={loading || otp.length !== 6}
-                      >
-                        {loading ? "Verifying..." : "Verify & Create Account"}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setStep("details")}
-                        className="w-full text-slate-500 hover:text-slate-900"
-                      >
-                        Back to Details
-                      </Button>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <FormField
+                      control={userForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                className="pl-12 pr-10 h-12 bg-slate-50 border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl transition-all"
+                                placeholder="••••••••"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                              >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={userForm.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 font-medium">Gender</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 bg-slate-50 border border-slate-200 hover:border-violet-300 focus:bg-white focus:border-violet-500 rounded-xl appearance-none outline-none transition-all text-slate-700 cursor-pointer"
+                                {...field}
+                              >
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                              </select>
+                              <ArrowRight className="absolute right-4 top-4 w-4 h-4 text-slate-500 rotate-90 pointer-events-none" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                </div>
-              )}
+
+                  <Button className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg mt-4 transition-all active:scale-[0.98]" type="submit" disabled={loading}>
+                    {loading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </form>
+              </Form>
             </TabsContent>
 
             {/* --- VENDOR FORM --- */}
@@ -472,7 +505,23 @@ export default function SignupPage() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-slate-700 font-medium">Password <span className="text-red-500">*</span></FormLabel>
-                            <FormControl><Input type="password" className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all" placeholder="••••••••" {...field} /></FormControl>
+                            <FormControl>
+                              <div className="relative group">
+                                <Input
+                                  type={showPassword ? "text" : "password"}
+                                  className="h-11 pr-10 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:border-violet-500 transition-all"
+                                  placeholder="••••••••"
+                                  {...field}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                >
+                                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                              </div>
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}

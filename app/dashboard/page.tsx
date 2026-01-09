@@ -38,8 +38,10 @@ export default function UserDashboard() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
+    } else if (status === "authenticated" && session?.user?.role === "vendor") {
+      router.push("/vendor/dashboard");
     }
-  }, [status, router]);
+  }, [status, router, session]);
 
   useEffect(() => {
     async function fetchDashboardData() {

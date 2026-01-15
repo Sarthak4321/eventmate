@@ -1,357 +1,725 @@
 "use client";
 
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, Variants } from "framer-motion";
-import Hero3DScene from "@/components/Hero3DScene";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  MapPin,
+  Calendar,
+  CheckCircle2,
+  ShieldCheck,
+  Users,
+  Sparkles,
+  ChevronDown,
+  Zap,
+  Heart,
+  Camera,
+  Music,
+  ChefHat,
+  MessageCircle,
+  Star,
+  Gift,
+  Wallet,
+  Percent
+} from "lucide-react";
+import { Select } from "@/components/ui/select";
 
-const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" }
-  }
-};
-
-const stagger: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2
-    }
-  }
-};
-
-const services = [
-  {
-    title: "Wedding Venues",
-    slug: "wedding-venues",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200",
-  },
-  {
-    title: "Photography",
-    slug: "photography",
-    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1200",
-  },
-  {
-    title: "Catering",
-    slug: "catering",
-    image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1200",
-  },
-  {
-    title: "Decor & Styling",
-    slug: "decor",
-    image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?w=1200",
-  },
-  {
-    title: "Makeup Artists",
-    slug: "makeup",
-    image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200",
-  },
-  {
-    title: "Entertainment",
-    slug: "entertainment",
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200",
-  },
+// --- HERO ASSETS ---
+const HERO_IMAGES = [
+  { src: "/hero/emotional-hero.png", alt: "Wedding Celebration", label: "Weddings" },
+  { src: "/hero/corporate-hero.png", alt: "Corporate Event", label: "Corporate" },
 ];
 
-export default function HomePage() {
+const HERO_MESSAGES = [
+  "This moment matters.",
+  "Business, but better.",
+];
+
+export default function EventOSHomePage() {
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const { scrollY } = useScroll();
+
+  // Parallax & Scroll Opacity for Hero
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 500], [1, 1.1]);
+  const contentY = useTransform(scrollY, [0, 500], [0, -50]);
+
+  // Hero Carousel Interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- STATE FOR GUIDED INPUT ---
+  const [eventType, setEventType] = useState("Wedding");
+  const [city, setCity] = useState("Delhi");
+  const [budget, setBudget] = useState("₹5L - ₹15L");
+
   return (
-    <main className="relative text-gray-900">
+    <main className="text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
 
-      {/* ================= HERO ================= */}
-      <section className="relative pt-24 md:pt-40 pb-20 bg-gradient-to-br from-purple-100 via-white to-pink-100">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 grid lg:grid-cols-2 gap-14 items-center">
 
-          {/* LEFT */}
+      {/* 1️⃣ HERO: CINEMATIC SYSTEM (FIXED/STICKY FEEL) */}
+      <section className="relative h-screen w-full overflow-hidden flex items-end justify-center md:items-start md:pt-60 pb-12 sticky top-0 z-0">
+
+        {/* Dynamic Backgrounds */}
+        <AnimatePresence mode="popLayout">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-block mb-3 px-4 py-1.5 rounded-full bg-purple-100 text-purple-600 text-xs sm:text-sm font-medium"
-            >
-              ✨ India’s trusted event discovery platform
-            </motion.span>
-
-            <motion.h1
-              variants={fadeInUp}
-              className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight"
-            >
-              Turn moments <br className="hidden sm:block" />
-              into unforgettable memories.
-            </motion.h1>
-
-            {/* MOBILE HERO IMAGE */}
-            <motion.div variants={fadeInUp} className="mt-6 lg:hidden relative h-[280px] w-full rounded-3xl overflow-hidden shadow-xl">
-              <Image
-                src="/hero/bride.jpg"
-                alt="Indian bridal wedding"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </motion.div>
-
-            <motion.p
-              variants={fadeInUp}
-              className="mt-5 text-sm sm:text-base md:text-lg text-gray-600 max-w-xl"
-            >
-              Weddings, celebrations, and corporate events — discover verified vendors,
-              inspiring ideas, and seamless planning in one place.
-            </motion.p>
-
-            {/* SEARCH */}
-            <motion.div variants={fadeInUp} className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
-              <input
-                placeholder="Search venues, photographers, makeup..."
-                className="w-full px-5 py-3 sm:py-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
-              />
-              <button className="px-6 py-3 sm:py-4 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition">
-                Explore
-              </button>
-            </motion.div>
-
-            <motion.p variants={fadeInUp} className="mt-3 text-xs sm:text-sm text-gray-500">
-              1,200+ verified vendors · Zero commission · Direct booking
-            </motion.p>
-          </motion.div>
-
-          {/* DESKTOP HERO */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            key={currentHeroIndex}
+            initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="hidden lg:flex justify-center"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0"
           >
-            <Hero3DScene />
+            <Image
+              src={HERO_IMAGES[currentHeroIndex].src}
+              alt={HERO_IMAGES[currentHeroIndex].alt}
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Vignette & Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/30"></div>
           </motion.div>
-        </div>
-      </section>
+        </AnimatePresence>
 
-      {/* ================= HOW IT WORKS ================= */}
-      <section className="bg-[#F7F7FB] py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-5 md:px-6">
-          <h2 className="text-2xl md:text-4xl font-semibold text-center">
-            Planning an event should feel exciting — not exhausting.
-          </h2>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-            className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                step: "01",
-                title: "Discover & Compare",
-                desc: "Explore verified vendors, real work, and transparent pricing.",
-              },
-              {
-                step: "02",
-                title: "Connect Directly",
-                desc: "Chat, negotiate, and finalize without commissions.",
-              },
-              {
-                step: "03",
-                title: "Celebrate Confidently",
-                desc: "Trusted partners and smooth bookings.",
-              },
-            ].map((item) => (
-              <motion.div
-                key={item.step}
-                variants={fadeInUp}
-                className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)] hover:shadow-[0_40px_90px_-30px_rgba(0,0,0,0.3)] transition-shadow duration-300"
+        {/* Hero Content */}
+        <motion.div
+          style={{ opacity: heroOpacity, y: contentY, scale: heroScale }}
+          className="relative z-10 w-full max-w-7xl px-6 text-center"
+        >
+          <div className="mb-4 inline-flex overflow-hidden rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={currentHeroIndex}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                className="text-xs font-bold uppercase tracking-widest text-white block"
               >
-                <span className="text-sm text-purple-600 font-medium">
-                  {item.step}
-                </span>
-                <h3 className="mt-3 text-xl font-semibold">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-gray-600">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
+                Planning for {HERO_IMAGES[currentHeroIndex].label}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight text-white mb-4 leading-[1.05] drop-shadow-2xl opacity-95 w-full mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={currentHeroIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{
+                  y: { duration: 0.8 },
+                  opacity: { duration: 0.8 },
+                  backgroundPosition: { duration: 5, repeat: Infinity, ease: "linear" }
+                }}
+                className="block bg-gradient-to-br from-cyan-300 via-violet-300 to-fuchsia-300 bg-[length:300%_auto] bg-clip-text text-transparent pb-2 drop-shadow-[0_2px_20px_rgba(168,85,247,0.4)]"
+                style={{ filter: "drop-shadow(0px 0px 30px rgba(139, 92, 246, 0.3))" }}
+              >
+                {HERO_MESSAGES[currentHeroIndex]}
+              </motion.span>
+            </AnimatePresence>
+            <span className="text-white/80 italic font-serif font-light block text-2xl md:text-4xl mt-2 tracking-normal drop-shadow-md">Let’s plan it right.</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-white/80 font-light max-w-xl mx-auto mb-8 leading-relaxed">
+            EventMate is your intelligent operating system for celebrations. <br />
+            Calm, verified, and completely commission-free.
+          </p>
+
+          {/* Guided Conversation Card (Now Relative inside flow for safety) */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="mx-auto max-w-4xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.2)] rounded-full p-2 pl-8 flex flex-col md:flex-row items-center gap-2 border border-slate-100 text-left"
+          >
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 w-full md:w-auto divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
+              {/* Event Type Input */}
+              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer">
+                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">I'm Planning</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10 text-left"
+                    value={eventType}
+                    onChange={(e) => setEventType(e.target.value)}
+                  >
+                    <option>Wedding</option>
+                    <option>Birthday</option>
+                    <option>Corporate</option>
+                    <option>Anniversary</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* City Input */}
+              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer">
+                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">In City</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  >
+                    <option>Delhi</option>
+                    <option>Mumbai</option>
+                    <option>Bangalore</option>
+                    <option>Goa</option>
+                    <option>Jaipur</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Budget Input */}
+              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer hidden md:block">
+                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">Budget</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                  >
+                    <option>₹5L - ₹15L</option>
+                    <option>₹15L - ₹30L</option>
+                    <option>₹30L - ₹50L</option>
+                    <option>₹50L+</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Search Button */}
+            <Link
+              href={`/services?type=${eventType}&city=${city}&budget=${budget}`}
+              className="w-full md:w-auto aspect-square h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-lg shrink-0 group"
+            >
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </motion.div>
-        </div>
+
+        </motion.div>
       </section>
 
-      {/* ================= SERVICES ================= */}
-      <section className="py-24 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
 
-          <h2 className="text-3xl md:text-4xl font-semibold mb-12">
-            Services curated for every celebration
-          </h2>
+      {/* 2️⃣ SCROLL OVERLAP CONTENT START */}
+      <div className="relative z-20 bg-white rounded-t-[3rem] -mt-10 pt-24 shadow-[0_-50px_100px_rgba(0,0,0,0.1)] overflow-hidden">
 
+        {/* 3️⃣ THE BIG IDEA (POSITIONING) */}
+        <section className="max-w-4xl mx-auto px-6 text-center mb-32">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
           >
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-8">
+              Planning an event shouldn’t <br /> feel like a full-time job.
+            </h2>
+            <p className="text-xl text-slate-500 font-light leading-relaxed max-w-2xl mx-auto">
+              EventMate replaces chaos, generic lists, and hidden commissions with <strong className="text-slate-900 font-medium">clarity, trust, and intelligent guidance.</strong>
+            </p>
+          </motion.div>
+        </section>
 
-            {[
-              {
-                title: "Wedding Venues",
-                slug: "wedding-venues",
-                img: "/hero/wedding-venue.jpg",
-              },
-              {
-                title: "Photography",
-                slug: "photography",
-                img: "/hero/photography.jpg",
-              },
-              {
-                title: "Makeup Artists",
-                slug: "makeup-artists",
-                img: "/hero/makeup.jpg",
-              },
-              {
-                title: "Decor & Styling",
-                slug: "decor-styling",
-                img: "/hero/decor.jpg",
-              },
-              {
-                title: "Catering",
-                slug: "catering",
-                img: "/hero/catering.jpg",
-              },
-              {
-                title: "Entertainment",
-                slug: "entertainment",
-                img: "/hero/entertainment.jpg",
-              },
-            ].map((item) => (
-              <motion.div key={item.slug} variants={fadeInUp}>
-                <Link
-                  href={`/services/${item.slug}`}
-                  className="group relative h-[260px] rounded-3xl overflow-hidden block"
+
+        {/* 4️⃣ HOW IT WORKS (STORY FLOW) */}
+        {/* 4️⃣ HOW IT WORKS (STORY JOURNEY) */}
+        <section className="max-w-7xl mx-auto px-6 mb-40 relative">
+
+          <div className="text-center mb-24 max-w-3xl mx-auto">
+            <span className="text-indigo-600 font-bold tracking-widest uppercase text-xs mb-4 block">The Process</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">From first thought to <br /> final applause.</h2>
+            <p className="text-slate-500 text-lg font-light leading-relaxed">
+              We don't just give you a list. We guide you through the chapters of planning, ensuring every detail lands perfectly.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Central Story Line (Desktop) */}
+            <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500/0 via-indigo-500/20 to-indigo-500/0 md:-translate-x-1/2 z-0" />
+
+            <div className="space-y-12 md:space-y-24">
+              {[
+                {
+                  step: "01",
+                  title: "The Spark",
+                  desc: "It starts with your vision. Tell us the vibe, the budget, and the dream. We listen between the lines.",
+                  icon: Sparkles,
+                  color: "bg-amber-100 text-amber-600 border-amber-200",
+                  align: "left",
+                  visual: (
+                    <div className="bg-white p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+                      <div className="mb-4">
+                        <div className="h-2 w-24 bg-slate-100 rounded mb-2" />
+                        <div className="h-10 bg-slate-50 rounded-lg border border-slate-200 flex items-center px-3 text-sm text-slate-400">
+                          <span className="animate-pulse">Traditional Wedding in...|</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-bold rounded-full border border-amber-100">Warm Lighting</span>
+                        <span className="px-3 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-full border border-slate-100">500 Pax</span>
+                      </div>
+                    </div>
+                  )
+                },
+                {
+                  step: "02",
+                  title: "The Curation",
+                  desc: "Our system filters through 1,200+ verified vendors to find the 3 perfect matches for your specific date and style.",
+                  icon: Users,
+                  color: "bg-indigo-100 text-indigo-600 border-indigo-200",
+                  align: "right",
+                  visual: (
+                    <div className="relative h-40 group">
+                      {[1, 2, 3].map((card, idx) => (
+                        <div key={idx}
+                          className="absolute bg-white p-3 rounded-xl shadow-lg border border-slate-100 w-48 transition-all duration-500"
+                          style={{
+                            top: idx * 10,
+                            left: idx * 20 + (idx === 1 ? 10 : 0),
+                            zIndex: 3 - idx,
+                            transform: `rotate(${idx % 2 === 0 ? -2 : 2}deg)`
+                          }}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-full bg-slate-200" />
+                            <div className="flex-1">
+                              <div className="h-2 w-16 bg-slate-200 rounded mb-1" />
+                              <div className="h-1.5 w-10 bg-slate-100 rounded" />
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map(s => <div key={s} className="w-1.5 h-1.5 bg-amber-400 rounded-full" />)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                },
+                {
+                  step: "03",
+                  title: "The Connection",
+                  desc: "Connect directly. No middlemen hiding details. Chat, meet, and see if the chemistry is right.",
+                  icon: MessageCircle,
+                  color: "bg-blue-100 text-blue-600 border-blue-200",
+                  align: "left",
+                  visual: (
+                    <div className="bg-white p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 max-w-xs mx-auto">
+                      <div className="space-y-3">
+                        <div className="flex items-end gap-2">
+                          <div className="w-6 h-6 rounded-full bg-indigo-100 flex-shrink-0" />
+                          <div className="bg-slate-100 px-3 py-2 rounded-2xl rounded-bl-sm text-xs text-slate-600">
+                            Is the 24th available?
+                          </div>
+                        </div>
+                        <div className="flex items-end gap-2 flex-row-reverse">
+                          <div className="w-6 h-6 rounded-full bg-blue-100 flex-shrink-0" />
+                          <div className="bg-blue-600 px-3 py-2 rounded-2xl rounded-br-sm text-xs text-white">
+                            Yes! We'd love to host you. 🎉
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                },
+                {
+                  step: "04",
+                  title: "The Reality",
+                  desc: "Secure it with a click. Escrow-protected payments mean you relax while the magic happens.",
+                  icon: Heart,
+                  color: "bg-rose-100 text-rose-600 border-rose-200",
+                  align: "right",
+                  visual: (
+                    <div className="bg-white p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden flex flex-col items-center __web-inspector-hide-shortcut__">
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-3">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                      <h4 className="font-bold text-slate-900">Booking Confirmed</h4>
+                      <p className="text-xs text-slate-400 mb-4">Invoice #INV-2024-001</p>
+                      <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="w-full h-full bg-green-500 rounded-full" />
+                      </div>
+                    </div>
+                  )
+                }
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className={`relative flex items-center gap-8 md:gap-16 ${item.align === "right" ? "md:flex-row-reverse" : "md:flex-row"}`}
                 >
-                  {/* IMAGE */}
-                  <Image
-                    src={item.img}
-                    alt={item.title}
-                    fill
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-
-                  {/* GRADIENT OVERLAY */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-
-                  {/* CONTENT */}
-                  <div className="absolute bottom-6 left-6 right-6 z-10">
-                    <p className="text-white text-xl font-semibold">
+                  {/* Content Box */}
+                  <div className={`flex-1 ${item.align === "right" ? "md:text-left" : "md:text-right"} pl-20 md:pl-0 z-10`}>
+                    <h3 className="text-3xl font-bold text-slate-900 mb-3 flex items-center gap-3 md:inline-flex">
+                      <span className="md:hidden text-xs font-bold px-2 py-1 bg-slate-100 rounded-md text-slate-500">Step {item.step}</span>
                       {item.title}
-                    </p>
-
-                    {/* Desktop hover text */}
-                    <p
-                      className="mt-1 text-sm text-white/80
-                  opacity-100 md:opacity-0 md:translate-y-2
-                  transition-all duration-500
-                  md:group-hover:opacity-100 md:group-hover:translate-y-0"
-                    >
-                      Explore vendors →
+                    </h3>
+                    <p className="text-slate-500 leading-relaxed font-light text-lg">
+                      {item.desc}
                     </p>
                   </div>
 
-                  {/* HOVER SHADOW */}
-                  <div
-                    className="absolute inset-0 rounded-3xl
-                transition-shadow duration-500
-                group-hover:shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
-                  />
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+                  {/* Center Node */}
+                  <div className="absolute left-0 md:relative md:left-auto shrink-0 z-10">
+                    <div className={`w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center ${item.color} relative z-10`}>
+                      <item.icon className="w-8 h-8" />
+                      <div className={`absolute -top-8 text-[10px] font-bold tracking-widest uppercase text-slate-400 hidden md:block whitespace-nowrap bg-white px-2 py-1 rounded-full border border-slate-100 shadow-sm`}>
+                        Step {item.step}
+                      </div>
+                    </div>
+                  </div>
 
-      {/* ================= TRUST ================= */}
-      <section className="py-20 md:py-32 bg-[#F7F7FB]">
-        <div className="max-w-7xl mx-auto px-5 md:px-6 text-center">
-          <h2 className="text-2xl md:text-4xl font-semibold">
-            Trusted for life’s most important moments
-          </h2>
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            From intimate celebrations to large-scale events, EventMate is trusted
-            across India.
-          </p>
+                  {/* Visual Mockup Side */}
+                  <div className="flex-1 hidden md:flex justify-center items-center">
+                    <div className={`w-full max-w-xs ${item.align === "right" ? "origin-left" : "origin-right"} hover:scale-105 transition-transform duration-500`}>
+                      {item.visual}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={stagger}
-            className="mt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
-          >
-            {[
-              { value: "1,200+", label: "Verified Vendors" },
-              { value: "50,000+", label: "Events Planned" },
-              { value: "0%", label: "Commission Model" },
-            ].map((stat) => (
-              <motion.div
-                key={stat.label}
-                variants={fadeInUp}
-                className="bg-white rounded-3xl p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]"
-              >
-                <p className="text-4xl font-semibold text-purple-600">
-                  {stat.value}
+
+        {/* 5️⃣ MULTI-EVENT GALLERY (BENTO GRID) */}
+        <section className="max-w-7xl mx-auto px-6 mb-32">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 mb-2 block">Our Expertise</span>
+              <h2 className="text-4xl font-bold tracking-tight text-slate-900">Whatever you’re planning.</h2>
+            </div>
+            <Link href="/services" className="hidden md:flex items-center gap-2 text-sm font-bold text-slate-900 border-b border-slate-200 pb-1 hover:border-slate-900 transition-colors">
+              View all categories <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+            {/* Large Item */}
+            <div className="md:col-span-2 md:row-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer">
+              <Image src="/hero/emotional-hero.png" alt="Wedding" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-8 left-8 text-white">
+                <h3 className="text-3xl font-bold tracking-tight mb-1">Weddings</h3>
+                <p className="text-white/70 text-sm">Grand venues, bridal makeup, cinema</p>
+              </div>
+            </div>
+
+            {/* Medium Item 1 */}
+            <div className="md:col-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer">
+              <Image src="/hero/corporate-hero.png" alt="Corporate" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-8 left-8 text-white">
+                <h3 className="text-2xl font-bold tracking-tight mb-1">Corporate & Networking</h3>
+                <p className="text-white/70 text-sm">Conferences, retreats, offsites</p>
+              </div>
+            </div>
+
+            {/* Small Item 1 */}
+            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100">
+              <Image src="/hero/birthday-hero.png" alt="Birthdays" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="text-lg font-bold mb-0.5">Birthdays</h3>
+                <p className="text-white/70 text-xs">Parties & Decor</p>
+              </div>
+            </div>
+
+            {/* Small Item 2 */}
+            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100">
+              <Image src="/hero/anniversary-hero.png" alt="Anniversaries" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-6 left-6 text-white">
+                <h3 className="text-lg font-bold mb-0.5">Anniversaries</h3>
+                <p className="text-white/70 text-xs">Intimate Dinners</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* 6️⃣ TRUST INDICATORS (PREMIUM & ANIMATED) */}
+        <section className="bg-white py-32 relative overflow-hidden">
+
+          {/* Ambient Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-indigo-50/50 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-20 max-w-2xl mx-auto"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">The EventMate Standard</h2>
+              <p className="text-slate-500 text-lg font-light">
+                We believe in total transparency and quality. That’s why we’re building the most trusted event platform in India.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {[
+                { number: "1,200+", label: "Verified Vendors", desc: "Every vendor is KYC verified.", icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50", border: "hover:border-emerald-200", shadow: "hover:shadow-emerald-500/10", accent: "group-hover:to-emerald-100" },
+                { number: "0%", label: "Platform Commission", desc: "Costs you nothing extra.", icon: Percent, color: "text-amber-600", bg: "bg-amber-50", border: "hover:border-amber-200", shadow: "hover:shadow-amber-500/10", accent: "group-hover:to-amber-100" },
+                { number: "100%", label: "Transparent Pricing", desc: "No hidden wedding taxes.", icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50", border: "hover:border-blue-200", shadow: "hover:shadow-blue-500/10", accent: "group-hover:to-blue-100" },
+                { number: "24/7", label: "Concierge Support", desc: "Real humans, always there.", icon: MessageCircle, color: "text-indigo-600", bg: "bg-indigo-50", border: "hover:border-indigo-200", shadow: "hover:shadow-indigo-500/10", accent: "group-hover:to-indigo-100" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.6 }}
+                  className={`relative group bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${stat.shadow} ${stat.border} flex flex-col items-center text-center overflow-hidden`}
+                >
+                  <div className={`w-20 h-20 rounded-[1.5rem] ${stat.bg} ${stat.color} flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm relative z-10`}>
+                    <stat.icon className="w-8 h-8" strokeWidth={2} />
+                  </div>
+
+                  <h4 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight group-hover:scale-105 transition-transform duration-300 origin-center relative z-10">{stat.number}</h4>
+
+                  <p className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-2 relative z-10">{stat.label}</p>
+
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity relative z-10">
+                    {stat.desc}
+                  </p>
+
+                  {/* Decorative corner accent */}
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-transparent ${stat.accent} rounded-bl-[100%] transition-all duration-500 opacity-0 group-hover:opacity-100`} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        {/* 7️⃣ FINAL CTA (CONFIDENT) */}
+        <section className="pt-32 pb-16 text-center px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-8">Ready to plan without the stress?</h2>
+            <Link href="/services" className="inline-flex items-center gap-3 px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-lg font-medium transition-all hover:scale-105 shadow-xl hover:shadow-indigo-200">
+              Start my event plan <ArrowRight className="w-5 h-5" />
+            </Link>
+            <p className="mt-8 text-sm text-slate-400">
+              Free for users. No credit card required to explore.
+            </p>
+          </div>
+        </section>
+
+        {/* 8️⃣ VENDOR ONBOARDING (ULTIMATE POLISH) */}
+        <section className="py-24 px-6 border-t border-slate-100 bg-slate-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-slate-900 rounded-[3rem] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] grid md:grid-cols-2 min-h-[700px] relative group">
+
+              {/* Background: Animated Gradient Orb */}
+              <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+              {/* Background: Subtle Grid */}
+              <div className="absolute inset-0 opacity-[0.03]"
+                style={{
+                  backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+                  backgroundSize: "40px 40px"
+                }}
+              />
+
+              {/* Left: Content & Value Props */}
+              <div className="p-12 md:p-20 flex flex-col justify-center relative z-10">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="inline-flex self-start items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase tracking-widest mb-8 border border-indigo-500/20 backdrop-blur-sm"
+                >
+                  <span className="w-2 h-2 rounded-full bg-indigo-400 animate-[pulse_2s_infinite]" />
+                  EventMate for Business
+                </motion.div>
+
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-8 tracking-tight leading-[1.05] text-white">
+                  Full Calendar. <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-white">Zero Stress.</span>
+                </h2>
+                <p className="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed font-light max-w-lg">
+                  EventMate is the <span className="text-white font-medium">OS for event professionals</span>. We handle the marketing, payments, and verified leads. You just show up and shine.
                 </p>
-                <p className="mt-2 text-gray-600">
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
-      {/* ================= VENDOR CTA ================= */}
-      <section className="py-20 md:py-32">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
-          className="max-w-5xl mx-auto px-5 md:px-6 text-center bg-white/80 backdrop-blur-xl rounded-3xl py-16 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.35)]"
-        >
-          <span className="inline-block mb-3 px-4 py-1 text-xs rounded-full bg-purple-100 text-purple-600 font-medium">
-            For Vendors
-          </span>
+                {/* Value Bullets (Card Style) */}
+                <div className="grid gap-4 mb-12">
+                  {[
+                    { title: "0% Commission", desc: "We don't take a cut. You keep it all.", icon: Percent, color: "bg-amber-500/20 text-amber-300 border-amber-500/20" },
+                    { title: "High-Value Leads", desc: "Avg. projects size of ₹2.5L+", icon: CheckCircle2, color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/20" },
+                    { title: "Guaranteed Payments", desc: "100% advance secured in escrow.", icon: Wallet, color: "bg-blue-500/20 text-blue-300 border-blue-500/20" },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.15 }}
+                      className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-default"
+                    >
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${item.color} shrink-0`}>
+                        <item.icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-bold text-lg">{item.title}</h4>
+                        <p className="text-slate-400 text-sm">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
 
-          <h2 className="text-2xl md:text-4xl font-semibold">
-            Built for vendors, not commissions.
-          </h2>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/contact?intent=vendor"
+                    className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-indigo-50 transition-all hover:scale-105 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                  >
+                    Claim Your Profile <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </div>
 
-          <p className="mt-4 text-gray-600 max-w-xl mx-auto">
-            Showcase your work, reach genuine customers, and grow without unfair cuts.
-          </p>
+              {/* Right: 3D Visualization */}
+              <div className="relative overflow-hidden flex items-center justify-center p-8 lg:p-0 perspective-[1000px]">
 
-          <Link
-            href="/become-a-vendor"
-            className="inline-block mt-8 px-10 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition-opacity"
-          >
-            Join as a Vendor →
-          </Link>
-        </motion.div>
-      </section>
+                {/* 3D Container */}
+                <motion.div
+                  initial={{ rotateY: -20, rotateX: 10, opacity: 0 }}
+                  whileInView={{ rotateY: -12, rotateX: 5, opacity: 1 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  viewport={{ once: true }}
+                  className="relative z-10 w-[340px] preserve-3d"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+
+                  {/* PHONE FRAME */}
+                  <div className="bg-slate-900 rounded-[3rem] p-4 shadow-[50px_50px_100px_-20px_rgba(0,0,0,0.6)] border-[6px] border-slate-700 relative h-[650px] ring-1 ring-white/20">
+
+                    {/* Screen Refection / Gloss */}
+                    <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-white/10 to-transparent pointer-events-none z-50" />
+
+                    {/* Dynamic Island */}
+                    <div className="absolute top-6 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-40 flex items-center justify-center gap-2 px-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[8px] font-medium text-white/80">Live</span>
+                    </div>
+
+                    {/* Screen Content */}
+                    <div className="w-full h-full bg-slate-50 rounded-[2.2rem] overflow-hidden flex flex-col relative">
+
+                      {/* Header */}
+                      <div className="pt-16 px-6 pb-6 bg-white border-b border-slate-100">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Balance</p>
+                            <h3 className="font-bold text-slate-900 text-3xl tracking-tight">₹14.2L</h3>
+                          </div>
+                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                            <Users className="w-5 h-5 text-slate-400" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Recent Activity Feed */}
+                      <div className="flex-1 bg-slate-50 p-4 space-y-3 overflow-hidden">
+                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-2">Live Activity</div>
+                        <AnimatePresence>
+                          {[
+                            { id: 1, title: "New Lead", sub: "Wedding • 500 Pax", val: "View", color: "bg-indigo-600 text-white" },
+                            { id: 2, title: "Payment", sub: "Advance Received", val: "+₹50k", color: "bg-white text-emerald-600 border border-slate-200" },
+                            { id: 3, title: "Review", sub: "New 5-star rating", val: "5.0", color: "bg-white text-amber-500 border border-slate-200" },
+                            { id: 4, title: "System", sub: "Weekly Report Ready", val: "PDF", color: "bg-white text-slate-900 border border-slate-200" },
+                          ].map((item, i) => (
+                            <motion.div
+                              key={item.id}
+                              initial={{ opacity: 0, x: 20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 1 + 1 }}
+                              className={`p-4 rounded-xl flex items-center justify-between shadow-sm ${item.color}`}
+                            >
+                              <div>
+                                <h4 className="font-bold text-sm">{item.title}</h4>
+                                <p className={`text-xs ${item.id === 1 ? 'text-indigo-200' : 'text-slate-400'}`}>{item.sub}</p>
+                              </div>
+                              <div className="text-sm font-bold">{item.val}</div>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* FLOATING EARNINGS GRAPH CARD (3D) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, x: 50, rotateY: 10 }}
+                    whileInView={{ opacity: 1, scale: 1, x: 20, rotateY: 0 }}
+                    transition={{ delay: 1.2, duration: 1 }}
+                    className="absolute -right-12 top-24 bg-white/90 backdrop-blur-xl p-5 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.3)] border border-white/60 w-56 z-50"
+                    style={{ transform: "translateZ(80px)" }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-xs font-bold text-slate-400 uppercase">Growth</div>
+                      <div className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">+28%</div>
+                    </div>
+
+                    {/* Animated SVG Path for Graph */}
+                    <div className="h-16 w-full relative">
+                      <svg className="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
+                        <motion.path
+                          d="M0 40 Q 20 35, 40 20 T 100 5"
+                          fill="none"
+                          stroke="#4f46e5"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          initial={{ pathLength: 0 }}
+                          whileInView={{ pathLength: 1 }}
+                          transition={{ duration: 2, ease: "easeInOut" }}
+                        />
+                        {/* Gradient Fill under line */}
+                        <motion.path
+                          d="M0 40 Q 20 35, 40 20 T 100 5 V 40 H 0 Z"
+                          fill="url(#gradient)"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 0.2 }}
+                          transition={{ delay: 1, duration: 1 }}
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stopColor="#6366f1" />
+                            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </motion.div>
+
+                </motion.div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+      {/* SCROLL OVERLAP CONTENT END */}
 
     </main>
   );
 }
-;

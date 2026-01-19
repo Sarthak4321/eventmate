@@ -199,7 +199,7 @@ export default function EventOSHomePage() {
               {/* Action Button */}
               <Link
                 href={`/services?type=${eventType}&city=${city}&budget=${budget}`}
-                className="h-12 sm:h-16 md:h-auto w-full md:w-auto aspect-auto md:aspect-square bg-white text-slate-900 rounded-xl sm:rounded-[1.8rem] flex items-center justify-center transition-all hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl md:shadow-none shrink-0"
+                className="h-12 sm:h-16 md:h-full w-full md:w-[4.5rem] aspect-auto md:aspect-square bg-white text-slate-900 rounded-xl sm:rounded-[1.8rem] flex items-center justify-center transition-all hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl md:shadow-none shrink-0"
               >
                 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </Link>

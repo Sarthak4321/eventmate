@@ -117,16 +117,13 @@ export default function EventOSHomePage() {
                 animate={{
                   opacity: 1,
                   y: 0,
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{
                   y: { duration: 0.8 },
                   opacity: { duration: 0.8 },
-                  backgroundPosition: { duration: 5, repeat: Infinity, ease: "linear" }
                 }}
-                className="block bg-gradient-to-br from-cyan-300 via-violet-300 to-fuchsia-300 bg-[length:300%_auto] bg-clip-text text-transparent pb-2 drop-shadow-[0_2px_20px_rgba(168,85,247,0.4)]"
-                style={{ filter: "drop-shadow(0px 0px 30px rgba(139, 92, 246, 0.3))" }}
+                className="block text-white drop-shadow-lg tracking-tight pb-2"
               >
                 {HERO_MESSAGES[currentHeroIndex]}
               </motion.span>
@@ -146,14 +143,14 @@ export default function EventOSHomePage() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="w-full max-w-[95%] sm:max-w-4xl mx-auto"
           >
-            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-1.5 sm:p-2 rounded-[1.2rem] sm:rounded-[2rem] shadow-2xl flex flex-col md:flex-row gap-1.5 sm:gap-2 relative z-20 transition-all hover:bg-white/15 hover:border-white/30 hover:scale-[1.01] duration-300">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-2 sm:p-3 rounded-[1.2rem] sm:rounded-[2rem] shadow-2xl flex flex-col md:flex-row gap-1.5 sm:gap-2 relative z-20 transition-all hover:bg-white/15 hover:border-white/30 hover:scale-[1.01] duration-300">
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-2 flex-grow p-0.5 sm:p-1">
                 {/* Type */}
-                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 col-span-2 md:col-span-1">
+                <div className="relative group px-3 py-3.5 sm:px-5 sm:py-3.5 bg-white/10 sm:bg-white/5 rounded-2xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 col-span-2 md:col-span-1">
                   <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">Event Type</label>
                   <select
-                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
+                    className="w-full bg-transparent font-medium text-xl sm:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
                   >
@@ -165,10 +162,10 @@ export default function EventOSHomePage() {
                 </div>
 
                 {/* City */}
-                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10">
+                <div className="relative group px-3 py-3.5 sm:px-5 sm:py-3.5 bg-white/10 sm:bg-white/5 rounded-2xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10">
                   <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">City</label>
                   <select
-                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
+                    className="w-full bg-transparent font-medium text-xl sm:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   >
@@ -244,8 +241,14 @@ export default function EventOSHomePage() {
           </div>
 
           <div className="relative">
-            {/* Central Story Line (Desktop) */}
-            <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500/0 via-indigo-500/20 to-indigo-500/0 md:-translate-x-1/2 z-0" />
+            {/* Central Story Line with Animated Beam */}
+            <div className="absolute left-6 md:left-1/2 top-0 bottom-24 w-px bg-gradient-to-b from-slate-100 via-slate-100 to-transparent md:-translate-x-1/2 z-0 overflow-hidden">
+              <motion.div
+                className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-transparent via-indigo-600 to-transparent opacity-80 shadow-[0_0_20px_2px_rgba(99,102,241,0.5)]"
+                animate={{ top: ["-20%", "120%"] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
 
             <div className="space-y-12 md:space-y-24">
               {[
@@ -340,7 +343,7 @@ export default function EventOSHomePage() {
                   color: "bg-rose-100 text-rose-600 border-rose-200",
                   align: "right",
                   visual: (
-                    <div className="bg-white p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden flex flex-col items-center __web-inspector-hide-shortcut__">
+                    <div className="bg-white p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-3">
                         <CheckCircle2 className="w-6 h-6" />
                       </div>
@@ -355,34 +358,45 @@ export default function EventOSHomePage() {
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className={`relative flex items-center gap-8 md:gap-16 ${item.align === "right" ? "md:flex-row-reverse" : "md:flex-row"}`}
+                  initial={{ opacity: 0, scale: 0.9, filter: "blur(4px)", y: 30 }}
+                  whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)", y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.8, type: "spring", bounce: 0.4, delay: i * 0.1 }}
+                  className={`relative flex items-start gap-4 md:gap-16 ${item.align === "right" ? "md:flex-row-reverse" : "md:flex-row"} md:items-center`}
                 >
                   {/* Content Box */}
-                  <div className={`flex-1 ${item.align === "right" ? "md:text-left" : "md:text-right"} pl-20 md:pl-0 z-10`}>
-                    <h3 className="text-3xl font-bold text-slate-900 mb-3 flex items-center gap-3 md:inline-flex">
-                      <span className="md:hidden text-xs font-bold px-2 py-1 bg-slate-100 rounded-md text-slate-500">Step {item.step}</span>
-                      {item.title}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20, rotateX: 20 }}
+                    whileInView={{ opacity: 1, x: 0, rotateX: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className={`flex-1 ${item.align === "right" ? "md:text-left" : "md:text-right"} pl-16 md:pl-0 z-10 pt-1 md:pt-0`}
+                  >
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 md:mb-3 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-end md:gap-3">
+                      <span className={`md:hidden text-[10px] font-bold text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-100 shadow-sm`}>
+                        Step {item.step}
+                      </span>
+                      <span className={item.align === "right" ? "md:mr-auto" : "md:ml-auto"}>{item.title}</span>
                     </h3>
-                    <p className="text-slate-500 leading-relaxed font-light text-lg">
+                    <p className="text-slate-500 leading-relaxed font-light text-base md:text-lg">
                       {item.desc}
                     </p>
-                  </div>
+                  </motion.div>
 
-                  {/* Center Node */}
+                  {/* Icon Node */}
                   <div className="absolute left-0 md:relative md:left-auto shrink-0 z-10">
-                    <div className={`w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center ${item.color} relative z-10`}>
-                      <item.icon className="w-8 h-8" />
+                    <motion.div
+                      whileInView={{ scale: [0, 1.1, 1], rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 0.6, ease: "backOut" }}
+                      className={`w-12 h-12 md:w-16 md:h-16 rounded-full border-[3px] md:border-4 border-white shadow-xl flex items-center justify-center ${item.color} relative z-10 ring-4 ring-slate-50/50`}
+                    >
+                      <item.icon className="w-5 h-5 md:w-8 md:h-8" strokeWidth={2.5} />
                       <div className={`absolute -top-8 text-[10px] font-bold tracking-widest uppercase text-slate-400 hidden md:block whitespace-nowrap bg-white px-2 py-1 rounded-full border border-slate-100 shadow-sm`}>
                         Step {item.step}
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
 
-                  {/* Visual Mockup Side */}
+                  {/* Visual Mockup Side (Desktop Only) */}
                   <div className="flex-1 hidden md:flex justify-center items-center">
                     <div className={`w-full max-w-xs ${item.align === "right" ? "origin-left" : "origin-right"} hover:scale-105 transition-transform duration-500`}>
                       {item.visual}

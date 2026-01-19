@@ -64,7 +64,7 @@ export default function EventOSHomePage() {
 
 
       {/* 1️⃣ HERO: CINEMATIC SYSTEM (FIXED/STICKY FEEL) */}
-      <section className="relative h-screen w-full overflow-hidden flex items-end justify-center md:items-start md:pt-60 pb-12 sticky top-0 z-0">
+      <section className="relative h-screen w-full overflow-hidden flex items-end justify-center md:items-start pt-28 md:pt-60 pb-28 sticky top-0 z-0">
 
         {/* Dynamic Backgrounds */}
         <AnimatePresence mode="popLayout">
@@ -91,9 +91,9 @@ export default function EventOSHomePage() {
         {/* Hero Content */}
         <motion.div
           style={{ opacity: heroOpacity, y: contentY, scale: heroScale }}
-          className="relative z-10 w-full max-w-7xl px-6 text-center"
+          className="relative z-10 w-full max-w-7xl px-4 md:px-6 text-center flex flex-col items-center h-full md:h-auto justify-center md:justify-start"
         >
-          <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/20 bg-white/10 px-4 py-1.5 sm:px-4 sm:py-1.5 backdrop-blur-xl shadow-lg whitespace-nowrap max-w-[90vw]">
+          <div className="mb-4 inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-xl shadow-lg whitespace-nowrap max-w-[90vw]">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shrink-0" />
             <AnimatePresence mode="wait">
               <motion.span
@@ -109,7 +109,7 @@ export default function EventOSHomePage() {
           </div>
 
           {/* Main Title - Clean & Elegant */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-serif font-medium tracking-tight text-white mb-4 sm:mb-6 leading-tight drop-shadow-2xl px-2">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-serif font-medium tracking-tight text-white mb-4 leading-[1.1] md:leading-tight drop-shadow-2xl px-2">
             <AnimatePresence mode="wait">
               <motion.span
                 key={currentHeroIndex}
@@ -128,10 +128,10 @@ export default function EventOSHomePage() {
                 {HERO_MESSAGES[currentHeroIndex]}
               </motion.span>
             </AnimatePresence>
-            <span className="text-white/80 italic font-serif font-light block text-2xl md:text-4xl mt-2 tracking-normal drop-shadow-md">Let’s plan it right.</span>
+            <span className="text-white/80 italic font-serif font-light block text-2xl md:text-4xl mt-1 md:mt-2 tracking-normal drop-shadow-md">Let’s plan it right.</span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-sans drop-shadow-lg px-4 sm:px-0">
+          <p className="hidden md:block text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto mb-8 leading-relaxed font-sans drop-shadow-lg px-4 sm:px-0">
             The intelligent operating system for your next celebration. <br className="hidden md:block" />
             <span className="text-indigo-200 font-medium opacity-90 block sm:inline mt-1 sm:mt-0">Verified. Commission-free. Simple.</span>
           </p>
@@ -141,16 +141,16 @@ export default function EventOSHomePage() {
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="w-full max-w-[95%] sm:max-w-4xl mx-auto"
+            className="w-full max-w-md md:max-w-4xl mx-auto mt-4 md:mt-0"
           >
-            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-2 sm:p-3 rounded-[1.2rem] sm:rounded-[2rem] shadow-2xl flex flex-col md:flex-row gap-1.5 sm:gap-2 relative z-20 transition-all hover:bg-white/15 hover:border-white/30 hover:scale-[1.01] duration-300">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-2 rounded-2xl md:rounded-[2rem] shadow-2xl flex flex-col md:flex-row gap-2 relative z-20 transition-all hover:bg-white/15 hover:border-white/30 duration-300">
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-2 flex-grow p-0.5 sm:p-1">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-grow">
                 {/* Type */}
-                <div className="relative group px-3 py-3.5 sm:px-5 sm:py-3.5 bg-white/10 sm:bg-white/5 rounded-2xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 col-span-2 md:col-span-1">
-                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">Event Type</label>
+                <div className="relative group px-3 py-2.5 md:px-5 md:py-3.5 bg-white/10 sm:bg-white/5 rounded-xl md:rounded-3xl hover:bg-white/15 transition-colors border border-white/10 sm:border-transparent cursor-pointer">
+                  <label className="text-[9px] md:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-0.5">Event Type</label>
                   <select
-                    className="w-full bg-transparent font-medium text-xl sm:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
+                    className="w-full bg-transparent font-medium text-base md:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
                   >
@@ -162,10 +162,10 @@ export default function EventOSHomePage() {
                 </div>
 
                 {/* City */}
-                <div className="relative group px-3 py-3.5 sm:px-5 sm:py-3.5 bg-white/10 sm:bg-white/5 rounded-2xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10">
-                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">City</label>
+                <div className="relative group px-3 py-2.5 md:px-5 md:py-3.5 bg-white/10 sm:bg-white/5 rounded-xl md:rounded-3xl hover:bg-white/15 transition-colors border border-white/10 sm:border-transparent cursor-pointer">
+                  <label className="text-[9px] md:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-0.5">City</label>
                   <select
-                    className="w-full bg-transparent font-medium text-xl sm:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
+                    className="w-full bg-transparent font-medium text-base md:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   >
@@ -178,10 +178,10 @@ export default function EventOSHomePage() {
                 </div>
 
                 {/* Budget */}
-                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 block">
-                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">Budget</label>
+                <div className="relative group px-3 py-2.5 md:px-5 md:py-3.5 bg-white/10 sm:bg-white/5 rounded-xl md:rounded-3xl hover:bg-white/15 transition-colors border border-white/10 sm:border-transparent cursor-pointer col-span-2 md:col-span-1">
+                  <label className="text-[9px] md:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-0.5">Budget</label>
                   <select
-                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
+                    className="w-full bg-transparent font-medium text-base md:text-xl text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
                   >
@@ -196,14 +196,20 @@ export default function EventOSHomePage() {
               {/* Action Button */}
               <Link
                 href={`/services?type=${eventType}&city=${city}&budget=${budget}`}
-                className="h-12 sm:h-16 md:h-full w-full md:w-[4.5rem] aspect-auto md:aspect-square bg-white text-slate-900 rounded-xl sm:rounded-[1.8rem] flex items-center justify-center transition-all hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl md:shadow-none shrink-0"
+                className="h-10 md:h-full w-full md:w-[4.5rem] bg-white text-slate-900 rounded-xl md:rounded-[1.8rem] flex items-center justify-center transition-all hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-lg md:shadow-none shrink-0"
               >
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
 
           </motion.div>
         </motion.div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-12 left-0 w-full z-30 flex flex-col items-center gap-2 animate-bounce opacity-80 pointer-events-none">
+          <span className="text-[10px] font-medium text-white/80 tracking-[0.2em] uppercase drop-shadow-md">Explore</span>
+          <ChevronDown className="w-5 h-5 text-white drop-shadow-md" />
+        </div>
       </section>
 
 

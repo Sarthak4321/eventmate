@@ -93,21 +93,23 @@ export default function EventOSHomePage() {
           style={{ opacity: heroOpacity, y: contentY, scale: heroScale }}
           className="relative z-10 w-full max-w-7xl px-6 text-center"
         >
-          <div className="mb-4 inline-flex overflow-hidden rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+          <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/20 bg-white/10 px-4 py-1.5 sm:px-4 sm:py-1.5 backdrop-blur-xl shadow-lg whitespace-nowrap max-w-[90vw]">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shrink-0" />
             <AnimatePresence mode="wait">
               <motion.span
                 key={currentHeroIndex}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
-                className="text-xs font-bold uppercase tracking-widest text-white block"
+                className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-100 truncate"
               >
                 Planning for {HERO_IMAGES[currentHeroIndex].label}
               </motion.span>
             </AnimatePresence>
           </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight text-white mb-4 leading-[1.05] drop-shadow-2xl opacity-95 w-full mx-auto">
+          {/* Main Title - Clean & Elegant */}
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-serif font-medium tracking-tight text-white mb-4 sm:mb-6 leading-tight drop-shadow-2xl px-2">
             <AnimatePresence mode="wait">
               <motion.span
                 key={currentHeroIndex}
@@ -132,26 +134,26 @@ export default function EventOSHomePage() {
             <span className="text-white/80 italic font-serif font-light block text-2xl md:text-4xl mt-2 tracking-normal drop-shadow-md">Let’s plan it right.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-white/80 font-light max-w-xl mx-auto mb-8 leading-relaxed">
-            EventMate is your intelligent operating system for celebrations. <br />
-            Calm, verified, and completely commission-free.
+          <p className="text-base sm:text-lg md:text-2xl text-white/90 font-light max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-sans drop-shadow-lg px-4 sm:px-0">
+            The intelligent operating system for your next celebration. <br className="hidden md:block" />
+            <span className="text-indigo-200 font-medium opacity-90 block sm:inline mt-1 sm:mt-0">Verified. Commission-free. Simple.</span>
           </p>
 
-          {/* Guided Conversation Card (Now Relative inside flow for safety) */}
+          {/* 🔍 GLASS SEARCH BAR - REFINED */}
           <motion.div
-            initial={{ y: 50, opacity: 0 }}
+            initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-            className="mx-auto max-w-4xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.2)] rounded-full p-2 pl-8 flex flex-col md:flex-row items-center gap-2 border border-slate-100 text-left"
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="w-full max-w-[95%] sm:max-w-4xl mx-auto"
           >
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 w-full md:w-auto divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-1.5 sm:p-2 rounded-[1.2rem] sm:rounded-[2rem] shadow-2xl flex flex-col md:flex-row gap-1.5 sm:gap-2 relative z-20 transition-all hover:bg-white/15 hover:border-white/30 hover:scale-[1.01] duration-300">
 
-              {/* Event Type Input */}
-              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer">
-                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">I'm Planning</label>
-                <div className="relative">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-2 flex-grow p-0.5 sm:p-1">
+                {/* Type */}
+                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 col-span-2 md:col-span-1">
+                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">Event Type</label>
                   <select
-                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10 text-left"
+                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
                   >
@@ -161,14 +163,12 @@ export default function EventOSHomePage() {
                     <option>Anniversary</option>
                   </select>
                 </div>
-              </div>
 
-              {/* City Input */}
-              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer">
-                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">In City</label>
-                <div className="relative">
+                {/* City */}
+                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10">
+                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">City</label>
                   <select
-                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10"
+                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   >
@@ -179,14 +179,12 @@ export default function EventOSHomePage() {
                     <option>Jaipur</option>
                   </select>
                 </div>
-              </div>
 
-              {/* Budget Input */}
-              <div className="relative group px-4 py-2 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer hidden md:block">
-                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block mb-1">Budget</label>
-                <div className="relative">
+                {/* Budget */}
+                <div className="relative group px-3 py-2 sm:px-5 sm:py-3 bg-white/10 sm:bg-white/5 rounded-xl sm:rounded-3xl hover:bg-white/15 sm:hover:bg-white/10 transition-colors border border-white/10 sm:border-transparent hover:border-white/20 sm:hover:border-white/10 block">
+                  <label className="text-[10px] sm:text-[10px] uppercase tracking-wider font-bold text-indigo-200 block mb-1">Budget</label>
                   <select
-                    className="w-full bg-transparent font-serif text-lg text-slate-900 outline-none border-none p-0 cursor-pointer appearance-none relative z-10"
+                    className="w-full bg-transparent font-medium text-lg sm:text-lg text-white outline-none border-none p-0 cursor-pointer appearance-none [&>option]:text-slate-900"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
                   >
@@ -198,26 +196,25 @@ export default function EventOSHomePage() {
                 </div>
               </div>
 
+              {/* Action Button */}
+              <Link
+                href={`/services?type=${eventType}&city=${city}&budget=${budget}`}
+                className="h-12 sm:h-16 md:h-auto w-full md:w-auto aspect-auto md:aspect-square bg-white text-slate-900 rounded-xl sm:rounded-[1.8rem] flex items-center justify-center transition-all hover:bg-indigo-50 hover:scale-105 active:scale-95 shadow-xl md:shadow-none shrink-0"
+              >
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </Link>
             </div>
 
-            {/* Search Button */}
-            <Link
-              href={`/services?type=${eventType}&city=${city}&budget=${budget}`}
-              className="w-full md:w-auto aspect-square h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-lg shrink-0 group"
-            >
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
           </motion.div>
-
         </motion.div>
       </section>
 
 
       {/* 2️⃣ SCROLL OVERLAP CONTENT START */}
-      <div className="relative z-20 bg-white rounded-t-[3rem] -mt-10 pt-24 shadow-[0_-50px_100px_rgba(0,0,0,0.1)] overflow-hidden">
+      <div className="relative z-20 bg-white rounded-t-[3rem] -mt-10 sm:-mt-20 pt-16 sm:pt-24 shadow-[0_-50px_100px_rgba(0,0,0,0.1)] overflow-hidden">
 
         {/* 3️⃣ THE BIG IDEA (POSITIONING) */}
-        <section className="max-w-4xl mx-auto px-6 text-center mb-32">
+        <section className="max-w-4xl mx-auto px-6 text-center mb-24 sm:mb-32">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -410,29 +407,29 @@ export default function EventOSHomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-auto md:h-[600px]">
             {/* Large Item */}
-            <div className="md:col-span-2 md:row-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer">
+            <div className="md:col-span-2 md:row-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer h-72 md:h-auto">
               <Image src="/hero/emotional-hero.png" alt="Wedding" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-8 left-8 text-white">
-                <h3 className="text-3xl font-bold tracking-tight mb-1">Weddings</h3>
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 text-white">
+                <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">Weddings</h3>
                 <p className="text-white/70 text-sm">Grand venues, bridal makeup, cinema</p>
               </div>
             </div>
 
             {/* Medium Item 1 */}
-            <div className="md:col-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer">
+            <div className="md:col-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer h-64 md:h-auto">
               <Image src="/hero/corporate-hero.png" alt="Corporate" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-8 left-8 text-white">
-                <h3 className="text-2xl font-bold tracking-tight mb-1">Corporate & Networking</h3>
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 text-white">
+                <h3 className="text-xl md:text-2xl font-bold tracking-tight mb-1">Corporate & Networking</h3>
                 <p className="text-white/70 text-sm">Conferences, retreats, offsites</p>
               </div>
             </div>
 
             {/* Small Item 1 */}
-            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100">
+            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100 h-48 md:h-auto">
               <Image src="/hero/birthday-hero.png" alt="Birthdays" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-6 left-6 text-white">
@@ -442,7 +439,7 @@ export default function EventOSHomePage() {
             </div>
 
             {/* Small Item 2 */}
-            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100">
+            <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer bg-slate-100 h-48 md:h-auto">
               <Image src="/hero/anniversary-hero.png" alt="Anniversaries" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-6 left-6 text-white">
@@ -475,7 +472,7 @@ export default function EventOSHomePage() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 max-w-sm sm:max-w-none mx-auto sm:mx-0">
               {[
                 { number: "1,200+", label: "Verified Vendors", desc: "Every vendor is KYC verified.", icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50", border: "hover:border-emerald-200", shadow: "hover:shadow-emerald-500/10", accent: "group-hover:to-emerald-100" },
                 { number: "0%", label: "Platform Commission", desc: "Costs you nothing extra.", icon: Percent, color: "text-amber-600", bg: "bg-amber-50", border: "hover:border-amber-200", shadow: "hover:shadow-amber-500/10", accent: "group-hover:to-amber-100" },
@@ -488,17 +485,17 @@ export default function EventOSHomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.6 }}
-                  className={`relative group bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${stat.shadow} ${stat.border} flex flex-col items-center text-center overflow-hidden`}
+                  className={`relative group bg-white rounded-3xl md:rounded-[2.5rem] p-4 md:p-8 border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${stat.shadow} ${stat.border} flex flex-col items-center text-center overflow-hidden h-full`}
                 >
-                  <div className={`w-20 h-20 rounded-[1.5rem] ${stat.bg} ${stat.color} flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm relative z-10`}>
-                    <stat.icon className="w-8 h-8" strokeWidth={2} />
+                  <div className={`w-12 h-12 md:w-20 md:h-20 rounded-2xl md:rounded-[1.5rem] ${stat.bg} ${stat.color} flex items-center justify-center mb-3 md:mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm relative z-10 mx-auto`}>
+                    <stat.icon className="w-5 h-5 md:w-8 md:h-8" strokeWidth={2} />
                   </div>
 
-                  <h4 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight group-hover:scale-105 transition-transform duration-300 origin-center relative z-10">{stat.number}</h4>
+                  <h4 className="text-2xl md:text-5xl font-extrabold text-slate-900 mb-1 md:mb-3 tracking-tight group-hover:scale-105 transition-transform duration-300 origin-center relative z-10">{stat.number}</h4>
 
-                  <p className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-2 relative z-10">{stat.label}</p>
+                  <p className="text-[10px] md:text-sm font-bold text-slate-900 uppercase tracking-widest mb-1 md:mb-2 relative z-10">{stat.label}</p>
 
-                  <p className="text-slate-500 text-sm font-medium leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity relative z-10">
+                  <p className="text-slate-500 text-[10px] md:text-sm font-medium leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity relative z-10 hidden sm:block">
                     {stat.desc}
                   </p>
 

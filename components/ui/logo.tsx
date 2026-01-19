@@ -6,7 +6,7 @@ interface LogoProps {
     size?: "sm" | "md" | "lg" | "xl";
 }
 
-export function Logo({ className, size = "md" }: LogoProps) {
+export function Logo({ className, size = "md", light = false }: LogoProps & { light?: boolean }) {
     const sizes = {
         sm: "text-xl",
         md: "text-2xl",
@@ -16,8 +16,8 @@ export function Logo({ className, size = "md" }: LogoProps) {
 
     return (
         <div className={cn("font-extrabold tracking-tight select-none font-sans flex items-center gap-0.5", sizes[size], className)}>
-            <span className="text-gray-900 drop-shadow-sm">Event</span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600 drop-shadow-sm filter">Mate</span>
+            <span className={cn("transition-colors", light ? "text-white" : "text-slate-900")}>Event</span>
+            <span className={cn("bg-clip-text text-transparent", light ? "bg-white" : "bg-gradient-to-r from-violet-600 to-indigo-600")}>Mate</span>
         </div>
     );
 }

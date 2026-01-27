@@ -9,7 +9,7 @@ export default function BecomeVendor() {
 
         <div>
           <h1 className="text-4xl md:text-5xl font-semibold">
-            Grow your event business with EventMate
+            Grow your event business with EvntMet
           </h1>
           <p className="mt-6 text-gray-600 text-lg">
             Get discovered by real customers. No commissions. No middlemen.

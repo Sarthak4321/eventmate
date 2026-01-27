@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Plan Your Event | EventMate Services",
+    title: "Plan Your Event | EvntMet Services",
     description: "Guidance, services, and smart recommendations for your Wedding, Birthday, or Corporate event.",
 };
 

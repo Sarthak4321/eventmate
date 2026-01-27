@@ -39,7 +39,7 @@ async function main() {
                 phone: '0987654321', // Different phone
                 vendorProfile: {
                     create: {
-                        businessName: 'EventMate Events',
+                        businessName: 'EvntMet Events',
                         category: 'Event Planner',
                         phone: '0987654321',
                         gstin: '22AAAAA0000A1Z5',

@@ -7,8 +7,8 @@ export default function PrivacyPage() {
 
                 <div className="prose prose-lg prose-gray max-w-none">
                     <p>
-                        Welcome to EventMate. We value your trust and are committed to protecting your personal information.
-                        This Privacy Policy explains how eventmate.com ("we," "us," or "our") collects, uses, shares, and protects your information when you use our website and services.
+                        Welcome to EvntMet. We value your trust and are committed to protecting your personal information.
+                        This Privacy Policy explains how evntmet.com ("we," "us," or "our") collects, uses, shares, and protects your information when you use our website and services.
                     </p>
 
                     <h3>1. Information We Collect</h3>
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
 
                     <h3>6. Contact Us</h3>
                     <p>
-                        If you have any questions about this Privacy Policy, please contact us at support@eventmate.com.
+                        If you have any questions about this Privacy Policy, please contact us at support@evntmet.com.
                     </p>
                 </div>
             </div>

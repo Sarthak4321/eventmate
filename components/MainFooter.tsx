@@ -23,7 +23,7 @@ export default function MainFooter() {
             Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Celebrate?</span>
           </h2>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light">
-            Join thousands of people planning their dream events with EventMate. <br className="hidden md:block" /> No stress. No hidden fees. Just magic.
+            Join thousands of people planning their dream events with EvntMet. <br className="hidden md:block" /> No stress. No hidden fees. Just magic.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -44,7 +44,7 @@ export default function MainFooter() {
 
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 flex flex-col gap-6">
-            <div className="text-2xl font-bold text-white tracking-tight">EventMate.</div>
+            <div className="text-2xl font-bold text-white tracking-tight">EvntMet.</div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
               The intelligent operating system for celebrations. We verify vendors, secure payments, and ensure your event happens exactly as you imagined.
             </p>
@@ -96,7 +96,7 @@ export default function MainFooter() {
 
         {/* Bottom Bar */}
         <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600 font-medium">
-          <div>© {new Date().getFullYear()} EventMate. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} EvntMet. All rights reserved.</div>
           <div className="flex gap-8">
             <Link href="#" className="hover:text-slate-400">Privacy Policy</Link>
             <Link href="#" className="hover:text-slate-400">Terms of Service</Link>

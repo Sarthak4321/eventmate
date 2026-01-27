@@ -16,8 +16,8 @@ export function Logo({ className, size = "md", light = false }: LogoProps & { li
 
     return (
         <div className={cn("font-extrabold tracking-tight select-none font-sans flex items-center gap-0.5", sizes[size], className)}>
-            <span className={cn("transition-colors", light ? "text-white" : "text-slate-900")}>Event</span>
-            <span className={cn("bg-clip-text text-transparent", light ? "bg-white" : "bg-gradient-to-r from-violet-600 to-indigo-600")}>Mate</span>
+            <span className={cn("transition-colors", light ? "text-white" : "text-slate-900")}>Evnt</span>
+            <span className={cn("bg-clip-text text-transparent", light ? "bg-white" : "bg-gradient-to-r from-violet-600 to-indigo-600")}>Met</span>
         </div>
     );
 }

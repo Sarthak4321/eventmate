@@ -42,7 +42,7 @@ export default function AboutVisionPage() {
     <main className="bg-white font-sans text-slate-900 selection:bg-indigo-100/50">
 
       {/* 🔹 SECTION 1: EMOTIONAL OPENING (HERO) */}
-      <section className="relative min-h-[90vh] flex items-center justify-center pt-24 pb-20 overflow-hidden">
+      <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden">
         <div className="max-w-5xl mx-auto px-6 text-center z-10">
           <motion.div
             initial="hidden"
@@ -51,7 +51,7 @@ export default function AboutVisionPage() {
             custom={0}
             variants={fadeUp}
           >
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] text-slate-900 mb-8">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] text-slate-900 mb-6 md:mb-8">
               Planning an event <br className="hidden md:block" />
               <span className="text-slate-400">shouldn’t feel overwhelming.</span>
             </h1>
@@ -63,9 +63,9 @@ export default function AboutVisionPage() {
             viewport={{ once: true }}
             custom={2}
             variants={fadeUp}
-            className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto leading-relaxed font-light"
+            className="text-lg sm:text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto leading-relaxed font-light px-4 md:px-0"
           >
-            EventMate exists to replace chaos, confusion, and middlemen with <span className="text-indigo-600 font-medium">clarity, trust, and smart guidance.</span>
+            EvntMet exists to replace chaos, confusion, and middlemen with <span className="text-indigo-600 font-medium">clarity, trust, and smart guidance.</span>
           </motion.p>
         </div>
 
@@ -75,8 +75,8 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 2: THE PROBLEM (REALITY CHECK) */}
-      <section className="py-24 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+      <section className="py-16 md:py-24 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -129,8 +129,8 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 3: THE INSIGHT */}
-      <section className="py-32 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      <section className="py-20 md:py-32 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -138,7 +138,7 @@ export default function AboutVisionPage() {
             custom={0}
             variants={fadeUp}
           >
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-6 md:mb-8">
               People don’t want options. <br />
               <span className="text-indigo-600">They want certainty.</span>
             </h2>
@@ -149,11 +149,11 @@ export default function AboutVisionPage() {
             viewport={{ once: true }}
             custom={1}
             variants={fadeUp}
-            className="text-xl text-slate-600 leading-relaxed font-light"
+            className="text-lg sm:text-xl text-slate-600 leading-relaxed font-light"
           >
             You don't need a directory of 5,000 photographers. You need the <strong>one</strong> who fits your budget, understands your style, and is available on your date.
             <br /><br />
-            EventMate isn't a marketplace. It’s an intelligent guide that says: <br />
+            EvntMet isn't a marketplace. It’s an intelligent guide that says: <br />
             <em>"Based on your budget, here is exactly who you should trust."</em>
           </motion.p>
         </div>
@@ -161,9 +161,9 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 4 & 5: SOLUTION & USP */}
-      <section className="py-24 bg-slate-900 text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-20">
+      <section className="py-16 md:py-24 bg-slate-900 text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             <div>
               <span className="text-indigo-400 font-bold tracking-widest uppercase text-xs mb-4 block">The Solution</span>
               <h2 className="text-3xl md:text-5xl font-bold mb-8">Not a directory. <br /> an Operating System.</h2>
@@ -192,9 +192,9 @@ export default function AboutVisionPage() {
             </div>
 
             {/* Visual Abstraction of "Input -> Intelligence -> Outcome" */}
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center mt-12 lg:mt-0">
               <div className="absolute inset-0 bg-indigo-500/10 blur-[100px] rounded-full"></div>
-              <div className="relative z-10 w-full max-w-md bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-8 rounded-3xl">
+              <div className="relative z-10 w-full max-w-md bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 sm:p-8 rounded-3xl">
                 <div className="space-y-6">
                   {/* Stop 1 */}
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-800 border border-slate-700">
@@ -212,7 +212,7 @@ export default function AboutVisionPage() {
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <span className="text-indigo-300 text-sm font-bold">EventMate Intelligence</span>
+                      <span className="text-indigo-300 text-sm font-bold">EvntMet Intelligence</span>
                       <div className="h-1.5 w-full bg-indigo-500/20 rounded mt-2"></div>
                     </div>
                   </div>
@@ -236,11 +236,11 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 6: BEYOND VENDORS (ECOSYSTEM) */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-16">Building the operating system for celebrations</h2>
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl font-bold text-slate-900 mb-10 md:mb-16">Building the operating system for celebrations</h2>
 
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { title: "Core Planning", icon: LayoutDashboard, connected: true },
               { title: "Financing & EMI", icon: CreditCard, connected: true },
@@ -260,8 +260,8 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 7: FOR VENDORS */}
-      <section className="py-24 bg-indigo-50 border-y border-indigo-100">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <section className="py-16 md:py-24 bg-indigo-50 border-y border-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="order-2 md:order-1">
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white p-6 rounded-2xl shadow-sm h-48 flex flex-col justify-end">
@@ -289,12 +289,12 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 8: TRUST & INTEGRITY */}
-      <section className="py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase mb-8">
             <ShieldCheck className="w-3.5 h-3.5" /> Our Promise
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-4xl font-bold text-green-600 mb-2">0%</h3>
               <p className="font-bold text-slate-900">Commission</p>
@@ -316,8 +316,8 @@ export default function AboutVisionPage() {
 
 
       {/* 🔹 SECTION 9: VISION STATEMENT */}
-      <section className="py-32 bg-slate-900 text-center text-white">
-        <div className="max-w-3xl mx-auto px-6">
+      <section className="py-20 md:py-32 bg-slate-900 text-center text-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h2 className="text-sm font-bold text-slate-400 tracking-widest uppercase mb-6">Our Vision</h2>
           <p className="text-2xl md:text-4xl font-serif italic text-slate-200 leading-relaxed mb-12">
             "To become India’s most trusted event planning platform — where every celebration is planned with confidence, clarity, and joy."

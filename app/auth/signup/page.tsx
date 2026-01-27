@@ -235,7 +235,7 @@ export default function SignupPage() {
         <div className="max-w-2xl w-full mx-auto my-4">
           <div className="mb-10 text-center">
             <h1 className="text-3xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">Create an account</h1>
-            <p className="text-slate-500 text-lg">Join EventMate to plan or manage events.</p>
+            <p className="text-slate-500 text-lg">Join EvntMet to plan or manage events.</p>
           </div>
 
           <div className="mb-6">

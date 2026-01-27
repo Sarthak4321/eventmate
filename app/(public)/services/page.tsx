@@ -436,7 +436,7 @@ export default function ServicesPage() {
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-[10px] font-extrabold tracking-widest uppercase mb-4 border border-green-100/50">
                             <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Platform
                         </span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">Why India trusts EventMate</h2>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">Why India trusts EvntMet</h2>
                         <p className="text-gray-500 text-lg">We don't just list services. We verify, protect, and guide you.</p>
                     </div>
 

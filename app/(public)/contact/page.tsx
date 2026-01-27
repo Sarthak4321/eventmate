@@ -81,7 +81,7 @@ export default function ContactPage() {
         >
           {[
             { id: "planning", icon: Sparkles, title: "Planning an Event", desc: "Guidance on venues & budgets" },
-            { id: "vendor", icon: Briefcase, title: "Vendor Partnership", desc: "Join EventMate & grow" },
+            { id: "vendor", icon: Briefcase, title: "Vendor Partnership", desc: "Join EvntMet & grow" },
             { id: "general", icon: HelpCircle, title: "General Inquiry", desc: "Questions or feedback" }
           ].map((item) => (
             <button
@@ -254,7 +254,7 @@ export default function ContactPage() {
               "Big moments deserve calm planning."
             </h2>
             <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
-              <Mail className="w-4 h-4" /> support@eventmate.in
+              <Mail className="w-4 h-4" /> support@evntmet.in
             </div>
           </div>
         </div>

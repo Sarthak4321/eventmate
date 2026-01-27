@@ -228,7 +228,7 @@ export default function EventOSHomePage() {
               Planning an event shouldn’t <br /> feel like a full-time job.
             </h2>
             <p className="text-xl text-slate-500 font-light leading-relaxed max-w-2xl mx-auto">
-              EventMate replaces chaos, generic lists, and hidden commissions with <strong className="text-slate-900 font-medium">clarity, trust, and intelligent guidance.</strong>
+              EvntMet replaces chaos, generic lists, and hidden commissions with <strong className="text-slate-900 font-medium">clarity, trust, and intelligent guidance.</strong>
             </p>
           </motion.div>
         </section>
@@ -486,7 +486,7 @@ export default function EventOSHomePage() {
               viewport={{ once: true }}
               className="mb-20 max-w-2xl mx-auto"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">The EventMate Standard</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">The EvntMet Standard</h2>
               <p className="text-slate-500 text-lg font-light">
                 We believe in total transparency and quality. That’s why we’re building the most trusted event platform in India.
               </p>
@@ -566,7 +566,7 @@ export default function EventOSHomePage() {
                   className="inline-flex self-start items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase tracking-widest mb-8 border border-indigo-500/20 backdrop-blur-sm"
                 >
                   <span className="w-2 h-2 rounded-full bg-indigo-400 animate-[pulse_2s_infinite]" />
-                  EventMate for Business
+                  EvntMet for Business
                 </motion.div>
 
                 <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-8 tracking-tight leading-[1.05] text-white">
@@ -574,7 +574,7 @@ export default function EventOSHomePage() {
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-white">Zero Stress.</span>
                 </h2>
                 <p className="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed font-light max-w-lg">
-                  EventMate is the <span className="text-white font-medium">OS for event professionals</span>. We handle the marketing, payments, and verified leads. You just show up and shine.
+                  EvntMet is the <span className="text-white font-medium">OS for event professionals</span>. We handle the marketing, payments, and verified leads. You just show up and shine.
                 </p>
 
                 {/* Value Bullets (Card Style) */}

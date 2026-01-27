@@ -13,7 +13,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 
 export const metadata = {
-  title: "EventMate - Plan Your Perfect Event",
+  title: "EvntMet - Plan Your Perfect Event",
   description: "The intelligent operating system for your celebrations.",
   icons: [
     { rel: "icon", url: "/icon-light.svg", media: "(prefers-color-scheme: light)" },

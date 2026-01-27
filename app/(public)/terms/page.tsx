@@ -7,12 +7,12 @@ export default function TermsPage() {
 
                 <div className="prose prose-lg prose-gray max-w-none">
                     <p>
-                        Please read these Terms of Service ("Terms") carefully before using EventMate. By accessing or using our platform, you agree to be bound by these Terms.
+                        Please read these Terms of Service ("Terms") carefully before using EvntMet. By accessing or using our platform, you agree to be bound by these Terms.
                     </p>
 
                     <h3>1. Acceptance of Terms</h3>
                     <p>
-                        By accessing or using EventMate, you confirm your agreement to be bound by these Terms. If you do not agree to these Terms, you may not access or use usage of our services.
+                        By accessing or using EvntMet, you confirm your agreement to be bound by these Terms. If you do not agree to these Terms, you may not access or use usage of our services.
                     </p>
 
                     <h3>2. Accounts and Registration</h3>
@@ -32,17 +32,17 @@ export default function TermsPage() {
 
                     <h3>4. Vendor Content and Services</h3>
                     <p>
-                        Vendors are independent contractors and not employees or agents of EventMate. We are not responsible for the quality, safety, or legality of the services provided by vendors. Any transaction between a user and a vendor is solely between those parties.
+                        Vendors are independent contractors and not employees or agents of EvntMet. We are not responsible for the quality, safety, or legality of the services provided by vendors. Any transaction between a user and a vendor is solely between those parties.
                     </p>
 
                     <h3>5. Intellectual Property</h3>
                     <p>
-                        The EventMate platform and its original content, features, and functionality are and will remain the exclusive property of EventMate and its licensors.
+                        The EvntMet platform and its original content, features, and functionality are and will remain the exclusive property of EvntMet and its licensors.
                     </p>
 
                     <h3>6. Limitation of Liability</h3>
                     <p>
-                        In no event shall EventMate, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
+                        In no event shall EvntMet, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
                     </p>
 
                     <h3>7. Termination</h3>
